@@ -1,6 +1,5 @@
 import React from 'react'
 import _ from 'lodash'
-
 import 'ol/ol.css'
 import {Map, View} from 'ol'
 import {defaults} from 'ol/interaction'
@@ -8,7 +7,7 @@ import MouseWheelZoom from 'ol/interaction/MouseWheelZoom'
 import {Tile as TileLayer} from 'ol/layer'
 import {transformExtent} from 'ol/proj'
 import XYZ from 'ol/source/XYZ'
-import {fromLonLat} from 'ol/proj'
+import {fromLonLat, toLonLat} from 'ol/proj'
 
 import {MAX_ZOOM, MIN_ZOOM} from './enums'
 
@@ -25,12 +24,20 @@ class MapWrapper extends React.Component {
   }
 }
 
+function getChartOptions(settings) {
+  const hashParts = (window.location.hash || '#').substring(1).split('/').map(parseFloat)
+  if (hashParts.length === 3 && hashParts.every(v => isFinite(v))) {
+    const center = fromLonLat([hashParts[1], hashParts[0]])
+    return {center, zoom: hashParts[2]}
+  }
+  return {center: fromLonLat([22.96,59.82]), zoom: settings.zoom}
+}
+
 function initMap(settings, events) {
   console.log('Init map')
-
+  const {center, zoom} = getChartOptions(settings)
   const olMap = new Map({
     target: 'map',
-
     controls: [],
     layers: [],
     interactions: defaults({
@@ -38,8 +45,8 @@ function initMap(settings, events) {
       pinchRotate: false
     }),
     view: new View({
-      center: fromLonLat([22.96,59.82]),
-      zoom: settings.zoom,
+      center,
+      zoom,
       minZoom: MIN_ZOOM,
       maxZoom: MAX_ZOOM,
     })
@@ -60,6 +67,16 @@ function initMap(settings, events) {
     console.log(`Unknown map event type ${type}`)
   })
 
+
+  function updateHash() {
+    const view = olMap.getView()
+    const center = view.getCenter()
+    const [longitude, latitude] = toLonLat(center)
+    const zoom = Math.round(view.getZoom())
+    window.history.pushState(null, null, `#${latitude.toFixed(4)}/${longitude.toFixed(4)}/${zoom}`)
+  }
+
+  olMap.on('moveend', updateHash)
 }
 
 function addCharts(map, charts) {
