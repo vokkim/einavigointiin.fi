@@ -35,6 +35,7 @@ function initMap(settings, events) {
     layers: [],
     interactions: defaults({
       mouseWheelZoom: false,
+      pinchRotate: false
     }),
     view: new View({
       center: fromLonLat([22.96,59.82]),
