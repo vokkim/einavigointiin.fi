@@ -1,0 +1,7 @@
+node_modules/
+.cache/
+dist/
+npm-debug.*
+client-config.json
+charts/
+import/*.geojson

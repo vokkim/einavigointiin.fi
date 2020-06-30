@@ -1,0 +1,111 @@
+@import '_reset.less';
+@import '_fonts.less';
+* {
+  box-sizing: border-box;
+}
+button {
+  cursor: pointer;
+}
+
+@tabletMaxWidth: 1025;
+@mobileMaxWidth: 550;
+@tabletMinWidth: (@mobileMaxWidth + 1);
+@desktopMinWidth: (@tabletMaxWidth + 1);
+@mobile: ~"(max-width: @{mobileMaxWidth}px)";
+@tablet: ~"(max-width: @{tabletMaxWidth}px)";
+@mobile-and-tablet: ~"(max-width: @{tabletMaxWidth}px)";
+@tablet-and-desktop: ~"(min-width: @{tabletMinWidth}px)";
+@desktop: ~"(min-width: @{desktopMinWidth}px)";
+
+
+@backgroundColor: #f9efca;
+@primaryTextColor: #000000;
+@fadedTextColor: #888888;
+@selectBackgroundColor: rgba(0, 0, 0, .06);
+@topBarHeight: 50px;
+@topbarBackgroundColor: #252525;
+
+body {
+  background: @backgroundColor;
+  font-family: 'OpenSans';
+  @media @desktop {
+    font-size: 17px;
+  }
+  @media @tablet {
+    font-size: 15px;
+  }
+}
+
+.topbar {
+  position: absolute;
+  display: flex;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: @topBarHeight;
+  background: @topbarBackgroundColor;
+}
+
+#search {
+  padding: 5px;
+  max-width: 400px;
+  margin-left: 20px;
+  flex: 1 0 auto;
+}
+
+.map-wrapper {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  top: @topBarHeight;
+  transition: top 0.25s;
+}
+#map {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.search__value {
+  padding: 5px 15px 5px 0px;
+  display: flex;
+  align-items: center;
+  .icon {
+    display: inline-block;
+    margin-right: 8px;
+    width: 15px;
+    height: 15px;
+  }
+}
+.search__value--municipality {
+  color: @fadedTextColor;
+  margin-left: 8px;
+}
+
+.search {
+  color: @primaryTextColor;
+  .search__control {
+    border-color: transparent !important;
+    box-shadow: none;
+    border-radius: 2px;
+    &.search__control--is-focused {
+      outline: none;
+    }
+  }
+  .search__value-container {
+    padding: 5px 15px;
+  }
+  .search__menu {
+    margin-top: 0px;
+    border-radius: 0px;
+  }
+  .search__option {
+    cursor: pointer;
+  }
+  .search__option--is-focused {
+    background: @selectBackgroundColor;
+  }
+}
