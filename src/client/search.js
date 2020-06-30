@@ -34,7 +34,7 @@ function getIconForType(type) {
   switch (type) {
   case 'turvalaite':
     return <LighthouseIcon />
-  case 'satama':
+  case 'official_harbour':
     return <HarbourIcon />
   default:
     return <PinIcon />

@@ -10,13 +10,34 @@ async function searchLocations(search) {
     const rows = await db.any(`
       SELECT
         type,
-        INITCAP(teksti_fin) as name_finnish,
-        INITCAP(teksti_swe) as name_swedish,
+        name_finnish,
+        name_swedish,
         municipality,
         ST_X(wkb_geometry) as longitude,
         ST_Y(wkb_geometry) as latitude,
-        CASE WHEN (starts_with(LOWER(concat(teksti_fin, '')), $2) OR starts_with(LOWER(concat(teksti_swe, '')), $2)) IS TRUE THEN 1 ELSE 2 END as priority
-        FROM locations WHERE teksti_fin ILIKE $1 OR teksti_swe ILIKE $1
+        priority
+        FROM (
+          SELECT
+            type,
+            INITCAP(teksti_fin) as name_finnish,
+            INITCAP(teksti_swe) as name_swedish,
+            wkb_geometry,
+            municipality,
+            kirjasinkoko,
+            CASE WHEN (starts_with(LOWER(concat(teksti_fin, '')), $2) OR starts_with(LOWER(concat(teksti_swe, '')), $2)) IS TRUE THEN 3 ELSE 4 END as priority
+          FROM locations WHERE teksti_fin ILIKE $1 OR teksti_swe ILIKE $1
+          UNION
+          SELECT
+            type,
+            name as name_finnish,
+            name as name_swedish,
+            wkb_geometry,
+            NULL as municipality,
+            400 as kirjasinkoko,
+            --CASE WHEN starts_with(LOWER(name)) IS TRUE THEN 1 ELSE 2 END as priority
+            1 as priority
+          FROM harbours WHERE name ILIKE $1 AND type != 'unknown_harbour'
+        ) as hits
         ORDER BY priority ASC, kirjasinkoko DESC
         LIMIT 15
     `, [`%${sanitizedSearch}%`, sanitizedSearch])
