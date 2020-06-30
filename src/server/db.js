@@ -48,6 +48,20 @@ async function searchLocations(search) {
   }
 }
 
+async function getAllOfficialHarbours() {
+  const rows = await db.any(`
+    SELECT
+      type,
+      name,
+      ST_X(wkb_geometry) as longitude,
+      ST_Y(wkb_geometry) as latitude,
+      harbour_number
+    FROM harbours WHERE type = 'official_harbour'
+  `)
+  return rows
+}
+
 module.exports = {
-  searchLocations
+  searchLocations,
+  getAllOfficialHarbours
 }

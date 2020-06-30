@@ -13,7 +13,8 @@ app.use('/map', chartRoutes)
 
 app.get('/', async (req, res) => {
   const index = await Promise.promisify(fs.readFile)(path.join(__dirname, '../../dist/index.html'))
-  res.send(index.toString('utf-8'))
+  const harbours = await db.getAllOfficialHarbours()
+  res.send(index.toString('utf-8').replace('HARBOUR_DATA', 'HARBOUR_DATA='+JSON.stringify(harbours)))
 })
 
 app.get('/search/:search', async (req, res) => {
