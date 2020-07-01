@@ -10,9 +10,8 @@ import XYZ from 'ol/source/XYZ'
 import {fromLonLat, toLonLat} from 'ol/proj'
 import Feature from 'ol/Feature'
 import Point from 'ol/geom/Point'
-import GeoJSON from 'ol/format/GeoJSON'
 import VectorSource from 'ol/source/Vector'
-import {Icon, Style, Fill, Stroke} from 'ol/style'
+import {Icon, Style} from 'ol/style'
 import {MAX_ZOOM, MIN_ZOOM} from './enums'
 
 class MapWrapper extends React.Component {
@@ -62,10 +61,37 @@ function initMap(settings, events) {
 
   addCharts(olMap, settings.charts)
 
+  const pinIconStyle = new Style({
+    image: new Icon({
+      anchor: [0.5, 1],
+      anchorXUnits: 'fraction',
+      src: 'pin.svg',
+      scale: 1
+    })
+  })
+  const pinMarker = new Feature({})
+  pinMarker.setStyle(pinIconStyle)
+  pinMarker.setStyle((feature, resolution) => {
+    pinIconStyle.getImage().setScale(1/Math.pow(resolution, 1/7) * 5)
+    return pinIconStyle
+  })
+
+  const markerLayer = new VectorLayer({
+    source: new VectorSource({
+      features: [pinMarker]
+    }),
+    zIndex: 1001,
+  })
+
+  olMap.addLayer(markerLayer)
+
   events.onValue(({type, value}) => {
     if (type === 'search') {
-      olMap.getView().setCenter(fromLonLat([value.longitude, value.latitude]))
+      const coordinates = fromLonLat([value.longitude, value.latitude])
+      olMap.getView().setCenter(coordinates)
       olMap.getView().setZoom(14)
+      console.log('Set geom')
+      pinMarker.setGeometry(new Point(coordinates))
       return
     }
     console.log(`Unknown map event type ${type}`)
@@ -121,11 +147,9 @@ function getChartExtent(provider) {
 }
 
 function placeOfficialHarbourMarkers(olMap) {
-
-  const markers = HARBOUR_DATA.map(harbour => {
-
+  const markers = window.HARBOUR_DATA.map(harbour => {
     const harbourIcon = new Icon({
-      anchor: [0.5, 0.5],
+      anchor: [0.25, 0.5],
       anchorXUnits: 'fraction',
       src: createIconForHarbour(harbour.harbour_number),
       scale: 1
@@ -146,8 +170,7 @@ function placeOfficialHarbourMarkers(olMap) {
     return marker
   })
 
-
-  const markerLayer = new VectorLayer({
+  const layer = new VectorLayer({
     source: new VectorSource({
       features: markers
     }),
@@ -155,7 +178,7 @@ function placeOfficialHarbourMarkers(olMap) {
     zIndex: 1000,
   })
 
-  olMap.addLayer(markerLayer)
+  olMap.addLayer(layer)
 }
 
 function createIconForHarbour(number) {
