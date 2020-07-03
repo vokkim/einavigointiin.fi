@@ -27,16 +27,16 @@ export class MapWrapper extends React.Component {
   constructor(props) {
     super(props)
     this.state = {measurements: []}
+    this.measuringInteraction = null
+    this.currentMeasureTooltip = null
+    this.currentMeasurement = null
+    this.selected = null
   }
 
   componentDidMount() {
-    this.measuringInteraction = null
-    this.map = null
-    this.currentMeasureTooltip = null
-    this.currentMeasurement = null
-    const {map} = initMap(this.props.settings, this.props.events)
-    this.map = map
+    this.initMap()
     this.measureTooltipRef = React.createRef()
+    this.tooltipRef = React.createRef()
   }
 
   componentDidUpdate(prevProps) {
@@ -53,8 +53,83 @@ export class MapWrapper extends React.Component {
         <div id="map" />
         <div>{this.state.measurements.map(({feature, tooltipRef}, i) => <div key={i}><div ref={tooltipRef} className='map-tooltip-measure map-tooltip-measure--old'>{formatLength(feature.getGeometry())}</div></div>)}</div>
         <div ref={this.measureTooltipRef} className='map-tooltip-measure'></div>
+        <div ref={this.tooltipRef} className='map-tooltip'></div>
       </div>
     )
+  }
+
+  initMap() {
+    console.log('Init map')
+    const {settings, events} = this.props
+    const {center, zoom} = getChartOptions(settings)
+    this.map = new Map({
+      target: 'map',
+      controls: [],
+      layers: [],
+      interactions: defaults({
+        mouseWheelZoom: false,
+        pinchRotate: false
+      }),
+      view: new View({
+        center,
+        zoom,
+        minZoom: MIN_ZOOM,
+        maxZoom: MAX_ZOOM,
+      })
+    })
+
+    const mouseWheelZoom = new MouseWheelZoom({useAnchor: true})
+    this.map.addInteraction(mouseWheelZoom)
+
+    addCharts(this.map, settings.charts)
+
+    const pinIconStyle = new Style({
+      image: new Icon({
+        anchor: [0.5, 1],
+        anchorXUnits: 'fraction',
+        src: 'pin.svg',
+        scale: 1
+      })
+    })
+    const pinMarker = new Feature({})
+    pinMarker.setStyle(pinIconStyle)
+    pinMarker.setStyle((feature, resolution) => {
+      pinIconStyle.getImage().setScale(1/Math.pow(resolution, 1/7) * 5)
+      return pinIconStyle
+    })
+
+    const markerLayer = new VectorLayer({
+      source: new VectorSource({
+        features: [pinMarker]
+      }),
+      zIndex: 1001,
+    })
+
+    this.map.addLayer(markerLayer)
+
+    events.onValue(({type, value}) => {
+      if (type === 'search') {
+        const coordinates = fromLonLat([value.longitude, value.latitude])
+        this.map.getView().setCenter(coordinates)
+        this.map.getView().setZoom(14)
+        pinMarker.setGeometry(new Point(coordinates))
+        return
+      }
+      console.log(`Unknown map event type ${type}`)
+    })
+
+
+    function updateHash() {
+      const view = this.map.getView()
+      const center = view.getCenter()
+      const [longitude, latitude] = toLonLat(center)
+      const zoom = Math.round(view.getZoom())
+      window.history.pushState(null, null, `#${latitude.toFixed(4)}/${longitude.toFixed(4)}/${zoom}`)
+    }
+
+    this.map.on('moveend', updateHash.bind(this))
+
+    placeOfficialHarbourMarkers(this.map)
   }
 
   clearMesaurement() {
@@ -165,82 +240,6 @@ function getChartOptions(settings) {
     return {center, zoom: hashParts[2]}
   }
   return {center: fromLonLat([22.96,59.82]), zoom: settings.zoom}
-}
-
-function initMap(settings, events) {
-  console.log('Init map')
-  const {center, zoom} = getChartOptions(settings)
-  const olMap = new Map({
-    target: 'map',
-    controls: [],
-    layers: [],
-    interactions: defaults({
-      mouseWheelZoom: false,
-      pinchRotate: false
-    }),
-    view: new View({
-      center,
-      zoom,
-      minZoom: MIN_ZOOM,
-      maxZoom: MAX_ZOOM,
-    })
-  })
-
-  const mouseWheelZoom = new MouseWheelZoom({useAnchor: true})
-  olMap.addInteraction(mouseWheelZoom)
-
-  addCharts(olMap, settings.charts)
-
-  const pinIconStyle = new Style({
-    image: new Icon({
-      anchor: [0.5, 1],
-      anchorXUnits: 'fraction',
-      src: 'pin.svg',
-      scale: 1
-    })
-  })
-  const pinMarker = new Feature({})
-  pinMarker.setStyle(pinIconStyle)
-  pinMarker.setStyle((feature, resolution) => {
-    pinIconStyle.getImage().setScale(1/Math.pow(resolution, 1/7) * 5)
-    return pinIconStyle
-  })
-
-  const markerLayer = new VectorLayer({
-    source: new VectorSource({
-      features: [pinMarker]
-    }),
-    zIndex: 1001,
-  })
-
-  olMap.addLayer(markerLayer)
-
-  events.onValue(({type, value}) => {
-    if (type === 'search') {
-      const coordinates = fromLonLat([value.longitude, value.latitude])
-      olMap.getView().setCenter(coordinates)
-      olMap.getView().setZoom(14)
-      console.log('Set geom')
-      pinMarker.setGeometry(new Point(coordinates))
-      return
-    }
-    console.log(`Unknown map event type ${type}`)
-  })
-
-
-  function updateHash() {
-    const view = olMap.getView()
-    const center = view.getCenter()
-    const [longitude, latitude] = toLonLat(center)
-    const zoom = Math.round(view.getZoom())
-    window.history.pushState(null, null, `#${latitude.toFixed(4)}/${longitude.toFixed(4)}/${zoom}`)
-  }
-
-  olMap.on('moveend', updateHash)
-
-  placeOfficialHarbourMarkers(olMap)
-
-  return {map: olMap}
 }
 
 function addCharts(map, charts) {
