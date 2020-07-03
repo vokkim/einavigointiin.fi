@@ -29,8 +29,8 @@ async function searchLocations(search) {
           UNION
           SELECT
             type,
-            name as name_finnish,
-            name as name_swedish,
+            INITCAP(name) as name_finnish,
+            INITCAP(name) as name_swedish,
             wkb_geometry,
             harbour_number::varchar as secondary_text,
             400 as kirjasinkoko,
@@ -48,7 +48,7 @@ async function searchLocations(search) {
   }
 }
 
-async function getAllOfficialHarbours() {
+async function getHarbours(types) {
   const rows = await db.any(`
     SELECT
       type,
@@ -56,12 +56,12 @@ async function getAllOfficialHarbours() {
       ST_X(wkb_geometry) as longitude,
       ST_Y(wkb_geometry) as latitude,
       harbour_number
-    FROM harbours WHERE type != 'unknown_harbour'
-  `)
+    FROM harbours WHERE type = ANY ($1)
+  `, [types])
   return rows
 }
 
 module.exports = {
   searchLocations,
-  getAllOfficialHarbours
+  getHarbours
 }

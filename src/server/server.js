@@ -13,7 +13,8 @@ app.use('/map', chartRoutes)
 
 app.get('/', async (req, res) => {
   const index = await Promise.promisify(fs.readFile)(path.join(__dirname, '../../dist/index.html'))
-  const harbours = await db.getAllOfficialHarbours()
+  const harbours = await db.getHarbours(['official_harbour'])
+  res.set('Cache-Control', 'public, max-age=86400')
   res.send(index.toString('utf-8').replace('HARBOUR_DATA', 'HARBOUR_DATA='+JSON.stringify(harbours)))
 })
 
