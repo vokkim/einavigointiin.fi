@@ -12,7 +12,7 @@ function loadOptions(inputValue) {
   if (coordinates) {
     return Promise.resolve([{value: {...coordinates, type: 'coordinate'}}])
   }
-  const url = `/search/${sanitizedInputValue}`
+  const url = `search/${sanitizedInputValue}`
   return fetch(url)
     .then(response => {
       if (response.status !== 200) {

@@ -4,8 +4,8 @@ const settings = require('./settings')
 
 const db = pg(settings.postgresConnection)
 
-async function searchLocations(search) {
-  const sanitizedSearch = search.trim().toLowerCase()
+async function searchLocations(search, views = []) {
+  const sanitizedSearch = search.toLowerCase()
   try {
     const rows = await db.any(`
       SELECT
@@ -34,13 +34,12 @@ async function searchLocations(search) {
             wkb_geometry,
             harbour_number::varchar as secondary_text,
             400 as kirjasinkoko,
-            --CASE WHEN starts_with(LOWER(name)) IS TRUE THEN 1 ELSE 2 END as priority
             1 as priority
-          FROM harbours WHERE (name ILIKE $1 OR harbour_number::varchar = $2) AND type != 'unknown_harbour'
+          FROM harbours WHERE (name ILIKE $1 OR harbour_number::varchar = $2) AND (type = 'official_harbour' OR view = ANY($3::uuid[]))
         ) as hits
         ORDER BY priority ASC, kirjasinkoko DESC
         LIMIT 15
-    `, [`%${sanitizedSearch}%`, sanitizedSearch])
+    `, [`%${sanitizedSearch}%`, sanitizedSearch, views])
     return rows
   } catch(e) {
     console.error(e)
@@ -48,7 +47,15 @@ async function searchLocations(search) {
   }
 }
 
-async function getHarbours(types) {
+async function getView(key) {
+  const rows = await db.any(`SELECT id, name FROM views WHERE key = $1`, [key])
+  if (rows.length !== 1) {
+    return null
+  }
+  return rows[0]
+}
+
+async function getHarbours(types, views = []) {
   const rows = await db.any(`
     SELECT
       type,
@@ -56,12 +63,13 @@ async function getHarbours(types) {
       ST_X(wkb_geometry) as longitude,
       ST_Y(wkb_geometry) as latitude,
       harbour_number
-    FROM harbours WHERE type = ANY ($1)
-  `, [types])
+    FROM harbours WHERE type = ANY($1) OR view = ANY($2::uuid[])
+  `, [types, views])
   return rows
 }
 
 module.exports = {
   searchLocations,
-  getHarbours
+  getHarbours,
+  getView
 }
