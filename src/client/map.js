@@ -12,18 +12,149 @@ import Feature from 'ol/Feature'
 import Point from 'ol/geom/Point'
 import VectorSource from 'ol/source/Vector'
 import {Icon, Style} from 'ol/style'
-import {MAX_ZOOM, MIN_ZOOM} from './enums'
+import {MAX_ZOOM, MIN_ZOOM, M_TO_NM} from './enums'
+import {getIconForHarbour} from './map-icons'
 
-class MapWrapper extends React.Component {
-  componentDidMount() {
-    initMap(this.props.settings, this.props.events)
+import {getLength} from 'ol/sphere'
+import Draw from 'ol/interaction/Draw'
+import {Circle as CircleStyle, Fill, Stroke} from 'ol/style'
+import {unByKey} from 'ol/Observable'
+import Overlay from 'ol/Overlay'
+
+export const MAP_MODE = {MEASURE: 'measure', NORMAL: 'normal'}
+export class MapWrapper extends React.Component {
+
+  constructor(props) {
+    super(props)
+    this.state = {measurements: []}
   }
+
+  componentDidMount() {
+    this.measuringInteraction = null
+    this.map = null
+    this.currentMeasureTooltip = null
+    this.currentMeasurement = null
+    const {map} = initMap(this.props.settings, this.props.events)
+    this.map = map
+    this.measureTooltipRef = React.createRef()
+  }
+
+  componentDidUpdate(prevProps) {
+    if (this.props.mode === MAP_MODE.NORMAL && prevProps.mode === MAP_MODE.MEASURE) {
+      this.clearMesaurement()
+    } else if (this.props.mode === MAP_MODE.MEASURE && prevProps.mode === MAP_MODE.NORMAL) {
+      this.initMeasurement()
+    }
+  }
+
   render() {
     return (
-      <div className='map-wrapper'>
+      <div className={`map-wrapper ${this.props.mode}`}>
         <div id="map" />
+        <div>{this.state.measurements.map(({feature, tooltipRef}, i) => <div key={i}><div ref={tooltipRef} className='map-tooltip-measure map-tooltip-measure--old'>{formatLength(feature.getGeometry())}</div></div>)}</div>
+        <div ref={this.measureTooltipRef} className='map-tooltip-measure'></div>
       </div>
     )
+  }
+
+  clearMesaurement() {
+    this.map.removeLayer(this.measurementLayer)
+    this.map.removeInteraction(this.draw)
+    this.state.measurements.forEach(({tooltip}) => {
+      this.map.removeOverlay(tooltip)
+    })
+    this.setState({measurements: []})
+    this.measurementLayer = null
+    this.draw = null
+  }
+
+  initMeasurement() {
+    if (!this.map) {
+      return
+    }
+    const source = new VectorSource()
+    this.measurementLayer = new VectorLayer({
+      source: source,
+      zIndex: 10,
+      style: new Style({
+        fill: new Fill({
+          color: '#3450FF'
+        }),
+        stroke: new Stroke({
+          color: '#3450FF',
+          width: 3
+        }),
+        image: new CircleStyle({
+          radius: 7,
+          fill: new Fill({
+            color: '#3450FF'
+          })
+        })
+      })
+    })
+
+    this.map.addLayer(this.measurementLayer)
+
+    this.draw = new Draw({
+      source: source,
+      type: 'LineString',
+      style: new Style({
+        fill: new Fill({
+          color: '#35abff'
+        }),
+        stroke: new Stroke({
+          color: '#35abff',
+          lineDash: [20, 10],
+          width: 3
+        }),
+        image: new CircleStyle({
+          radius: 5,
+          stroke: new Stroke({
+            color: '#ffffff',
+            width: 1
+          }),
+          fill: new Fill({
+            color: '#35abff'
+          })
+        })
+      })
+    })
+    this.map.addInteraction(this.draw)
+
+
+    var listener
+    this.draw.on('drawstart', (evt) => {
+      this.currentMeasurement = evt.feature
+
+      this.currentMeasureTooltip = new Overlay({
+        element: this.measureTooltipRef.current,
+        offset: [0, -15],
+        positioning: 'bottom-center'
+      })
+      this.map.addOverlay(this.currentMeasureTooltip)
+
+      listener = this.currentMeasurement.getGeometry().on('change', (e) => {
+        const output = formatLength(e.target)
+        const tooltipCoord = e.target.getLastCoordinate()
+        this.measureTooltipRef.current.innerHTML = output
+        this.currentMeasureTooltip.setPosition(tooltipCoord)
+      })
+    })
+
+    this.draw.on('drawend', () => {
+      const tooltipRef = React.createRef()
+      const tooltip = this.currentMeasureTooltip
+      const measurements = this.state.measurements.concat([{
+        feature: this.currentMeasurement,
+        tooltip,
+        tooltipRef
+      }])
+      this.setState({measurements})
+      setTimeout(() => {
+        tooltip.setElement(tooltipRef.current)
+      }, 1)
+      unByKey(listener)
+    })
   }
 }
 
@@ -57,7 +188,6 @@ function initMap(settings, events) {
 
   const mouseWheelZoom = new MouseWheelZoom({useAnchor: true})
   olMap.addInteraction(mouseWheelZoom)
-
 
   addCharts(olMap, settings.charts)
 
@@ -109,6 +239,8 @@ function initMap(settings, events) {
   olMap.on('moveend', updateHash)
 
   placeOfficialHarbourMarkers(olMap)
+
+  return {map: olMap}
 }
 
 function addCharts(map, charts) {
@@ -148,12 +280,7 @@ function getChartExtent(provider) {
 
 function placeOfficialHarbourMarkers(olMap) {
   const markers = window.HARBOUR_DATA.map(harbour => {
-    const harbourIcon = new Icon({
-      anchor: [0.25, 0.5],
-      anchorXUnits: 'fraction',
-      src: createIconForHarbour(harbour.harbour_number),
-      scale: 1
-    })
+    const harbourIcon = getIconForHarbour(harbour)
 
     const iconStyle = new Style({
       image: harbourIcon
@@ -181,26 +308,7 @@ function placeOfficialHarbourMarkers(olMap) {
   olMap.addLayer(layer)
 }
 
-function createIconForHarbour(number) {
-  const harbourIconAsText = `<?xml version="1.0" encoding="UTF-8"?>
-<svg width="31px" height="14px" viewBox="0 0 31 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-<g id="Group-46" transform="translate(1.000000, 1.000000)">
-<text fill="#EE3339" font-family="ArialMT, Arial" font-size="9" font-weight="normal" letter-spacing="0.2">
-<tspan x="14" y="9">${number}</tspan>
-</text>
-<g>
-<circle stroke="#EE3339" fill-opacity="0.559686407" fill="#FEFEFE" cx="6" cy="6" r="6"></circle>
-<polygon fill="#EE3339" points="5 1 10 7 5 7"></polygon>
-<path d="M3.79305374,4.83082608 L8.40473886,10.7259805 C6.75954003,11.0688737 5.4131096,10.5707029 4.36544758,9.23146804 C3.31778555,7.89223319 3.12698761,6.42535253 3.79305374,4.83082608 Z" fill="#EE3339" transform="translate(5.904739, 7.830826) rotate(-51.000000) translate(-5.904739, -7.830826) "></path>
-</g>
-</g>
-</g>
-</svg>`.replace('\n', '')
-
-  return 'data:image/svg+xml;utf8,' + encodeURIComponent(harbourIconAsText)
+function formatLength(line) {
+  const length = getLength(line)
+  return `${(length * M_TO_NM).toFixed(2)} nm`
 }
-
-
-
-export default MapWrapper

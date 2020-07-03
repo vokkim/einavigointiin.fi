@@ -1,6 +1,6 @@
 import React from 'react'
 import AsyncSelect from 'react-select/async'
-import {LighthouseIcon, PinIcon, HarbourIcon} from './icons'
+import {LighthouseIcon, PinIcon, HarbourIcon, MerikarhuHarbourIcon} from './icons'
 import {parseCoordinates} from './coordinates-parser'
 
 function loadOptions(inputValue) {
@@ -10,7 +10,6 @@ function loadOptions(inputValue) {
   }
   const coordinates = parseCoordinates(sanitizedInputValue)
   if (coordinates) {
-    console.log('CORDINATE', coordinates)
     return Promise.resolve([{value: {...coordinates, type: 'coordinate'}}])
   }
   const url = `/search/${sanitizedInputValue}`
@@ -36,6 +35,8 @@ function getIconForType(type) {
     return <LighthouseIcon />
   case 'official_harbour':
     return <HarbourIcon />
+  case 'merikarhu_harbour':
+    return <MerikarhuHarbourIcon />
   default:
     return <PinIcon />
   }

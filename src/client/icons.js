@@ -64,3 +64,62 @@ export class HarbourIcon extends React.Component {
     )
   }
 }
+
+export class MeasurementIcon extends React.Component {
+  shouldComponentUpdate() {
+    return false
+  }
+
+  render() {
+    return (
+      <svg width="35px" height="20px" viewBox="0 0 47 24" version="1.1">
+        <g stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
+          <g>
+            <path d="M4,0 L43,0 C45.209139,-4.05812251e-16 47,1.790861 47,4 L47,11 L0,11 L0,4 C-2.705415e-16,1.790861 1.790861,4.05812251e-16 4,0 Z" fill="#D8D8D8"></path>
+            <g transform="translate(2.000000, 5.000000)" stroke="#252525" strokeLinecap="square">
+              <path d="M36.5,6 L36.5,0.5" id="Line"></path>
+              <path d="M42.5,6 L42.5,0.5" id="Line"></path>
+              <path d="M39.5,6 L39.5,2.5" id="Line"></path>
+              <path d="M0.5,6 L0.5,0.5" id="Line"></path>
+              <path d="M6.5,6 L6.5,0.5" id="Line"></path>
+              <path d="M3.5,6 L3.5,2.5" id="Line"></path>
+              <path d="M9.5,6 L9.5,2.5" id="Line"></path>
+              <path d="M12.5,6 L12.5,0.5" id="Line"></path>
+              <path d="M18.5,6 L18.5,0.5" id="Line"></path>
+              <path d="M15.5,6 L15.5,2.5" id="Line"></path>
+              <path d="M21.5,6 L21.5,2.5" id="Line"></path>
+              <path d="M24.5,6 L24.5,0.5" id="Line"></path>
+              <path d="M30.5,6 L30.5,0.5" id="Line"></path>
+              <path d="M27.5,6 L27.5,2.5" id="Line"></path>
+              <path d="M33.5,6 L33.5,2.5" id="Line"></path>
+            </g>
+            <polyline stroke="#D8D8D8" strokeWidth="2" strokeLinecap="square" points="2.5 19.5 21.8333811 16.052969 25.8007643 22.6379185 44.5 19.5"></polyline>
+            <circle fill="#D8D8D8" cx="2.5" cy="19.5" r="2.5"></circle>
+            <circle fill="#D8D8D8" cx="44.5" cy="19.5" r="2.5"></circle>
+          </g>
+        </g>
+      </svg>
+    )
+  }
+}
+
+export class MerikarhuHarbourIcon extends React.Component {
+  shouldComponentUpdate() {
+    return false
+  }
+
+  render() {
+    return (
+      <svg className="icon icon--harbour" width="15px" height="15px" viewBox="0 0 15 15">
+        <g stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
+          <g transform="translate(1.000000, 1.000000)">
+            <path d="M4.5,5.5 L5,11.2570625" stroke="#007F44" strokeWidth="0.5" strokeLinecap="square"></path>
+            <circle stroke="#007F44" cx="6.5" cy="6.5" r="6.5"></circle>
+            <path d="M8.7078346,2.2843464 C8.01234144,3.65969974 7.57248322,4.85081948 7.38825994,5.8577056 C7.20403666,6.86459173 7.20403666,8.07755002 7.38825994,9.49658048 C6.5727345,9.40016789 5.7825442,9.40016789 5.01768905,9.49658048 C4.2528339,9.59299308 3.71179075,9.76079958 3.3945596,10 C3.53713238,8.39738746 3.94215644,7.1114452 4.6096318,6.1421732 C5.27710717,5.1729012 6.64317477,3.88695893 8.7078346,2.2843464 Z" fill="#007F44"></path>
+            <path d="M8.64214667,6.95757203 C6.5609206,8.76204176 5.69406655,10.2982376 6.04158452,11.5661595 L4.61480263,13.459563 C4.14718969,11.40399 4.2471209,9.89156755 4.91459626,8.92229555 C5.52962772,8.02917977 6.37192252,7.11361168 8.32292692,6.7170227 C8.47999118,6.68509557 8.58639777,6.76527868 8.64214667,6.95757203 Z" fill="#007F44" transform="translate(6.483996, 10.084883) rotate(-127.000000) translate(-6.483996, -10.084883) "></path>
+          </g>
+        </g>
+      </svg>
+    )
+  }
+}

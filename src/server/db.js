@@ -52,11 +52,11 @@ async function getAllOfficialHarbours() {
   const rows = await db.any(`
     SELECT
       type,
-      name,
+      INITCAP(name) as name,
       ST_X(wkb_geometry) as longitude,
       ST_Y(wkb_geometry) as latitude,
       harbour_number
-    FROM harbours WHERE type = 'official_harbour'
+    FROM harbours WHERE type != 'unknown_harbour'
   `)
   return rows
 }
