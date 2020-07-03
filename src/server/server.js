@@ -21,7 +21,10 @@ app.get('/', async (req, res) => {
   res.send(index.toString('utf-8').replace('HARBOUR_DATA', 'HARBOUR_DATA='+JSON.stringify(harbours)))
 })
 
-app.get('/view/:key', async (req, res) => {
+app.get('/view/:key/', async (req, res) => {
+  if (!req.url.endsWith('/')) {
+    return res.redirect(req.url + '/')
+  }
   const view = await findView(req.params.key)
   if (!view) {
     return res.sendStatus(404)
