@@ -252,7 +252,8 @@ function addCharts(map, charts) {
     const source = new XYZ({
       url: tilemapUrl,
       maxZoom: maxzoom,
-      minZoom: minzoom
+      minZoom: minzoom,
+      tilePixelRatio: window.devicePixelRatio === 2 ? 2 : 1
     })
 
     const layer = new TileLayer({
