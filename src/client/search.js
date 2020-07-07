@@ -80,7 +80,7 @@ export default class Search extends React.Component {
           components={{IndicatorsContainer}}
           loadingMessage={() => <span>...</span>}
           openMenuOnFocus={false}
-          placeholder='Hae saarta, satamaa, paikkaa tai koordinaattia'
+          placeholder='Hae satamaa, paikkaa tai koordinaattia'
           formatOptionLabel={optionFormatter}
           noOptionsMessage={() => <span>Ei hakutuloksia</span>}
           loadOptions={loadOptions}
