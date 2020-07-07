@@ -25,10 +25,10 @@ const merikarhuHarbourIcon = new Icon({
 
 function createIconForHarbour(number) {
   const harbourIconAsText = `<?xml version="1.0" encoding="UTF-8"?>
-<svg width="31px" height="14px" viewBox="0 0 31 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="31px" height="14px" viewBox="0 0 35 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-<g id="Group-46" transform="translate(1.000000, 1.000000)">
-<text fill="#EE3339" font-family="ArialMT, Arial" font-size="9" font-weight="normal" letter-spacing="0.2">
+<g transform="translate(1.000000, 1.000000)">
+<text fill="#EE3339" font-family="ArialMT, Arial" font-size="9" font-weight="normal" letter-spacing="0.1">
 <tspan x="14" y="9">${number}</tspan>
 </text>
 <g>
