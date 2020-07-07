@@ -19,6 +19,7 @@ button {
 
 
 @backgroundColor: #f9efca;
+@mapBackgroundColor: #fefefe;
 @primaryTextColor: #000000;
 @fadedTextColor: #888888;
 @selectBackgroundColor: rgba(0, 0, 0, .06);
@@ -27,6 +28,8 @@ button {
 
 @measurementColor: #35abff;
 @measurementColorOld: #3450FF;
+
+@tooltipBackgroundColor: #808080;
 
 body {
   background: @backgroundColor;
@@ -59,6 +62,15 @@ button {
   height: @topBarHeight;
   &.active {
     background: lighten(@topbarBackgroundColor, 8);
+
+    .icon--measurement {
+      path, circle {
+        fill: @measurementColor;
+      }
+      polyline {
+        stroke: @measurementColor;
+      }
+    }
   }
 }
 
@@ -86,6 +98,9 @@ button {
   right: 0;
   top: @topBarHeight;
   transition: top 0.25s;
+  &.hover #map {
+    cursor: pointer;
+  }
 }
 #map {
   position: absolute;
@@ -93,6 +108,7 @@ button {
   bottom: 0;
   left: 0;
   right: 0;
+  background: @mapBackgroundColor;
 }
 
 .search__value {
@@ -134,23 +150,41 @@ button {
   .search__option--is-focused {
     background: @selectBackgroundColor;
   }
+
+  .search__placeholder {
+    overflow-x: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    width: 90%;
+  }
 }
 
 .map-wrapper.measure .map-tooltip-measure {
   display: block;
 }
-.map-tooltip-measure {
-  display: none;
-  z-index: -1;
+
+.map-tooltip, .map-tooltip-measure {
   position: relative;
-  background: @measurementColor;
   border-radius: 2px;
-  color: white;
   padding: 4px 8px;
   white-space: nowrap;
   font-size: 12px;
-  opacity: 1;
   font-weight: bold;
+}
+
+.map-tooltip {
+  z-index: 2;
+  background: @tooltipBackgroundColor;
+  color: white;
+  opacity: 0.8;
+}
+
+.map-tooltip-measure {
+  display: none;
+  z-index: -1;
+  background: @measurementColor;
+  color: white;
+  opacity: 1;
 }
 .map-tooltip-measure--old {
   background-color: @measurementColorOld;

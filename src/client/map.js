@@ -26,17 +26,19 @@ export class MapWrapper extends React.Component {
 
   constructor(props) {
     super(props)
-    this.state = {measurements: []}
+    this.state = {measurements: [], hoveredHarbourFeature: null, hovering: false}
     this.measuringInteraction = null
     this.currentMeasureTooltip = null
     this.currentMeasurement = null
+    this.tooltipOverlay = null
+    this.pinMarker = null
+    this.tooltipRef = React.createRef()
+    this.measureTooltipRef = React.createRef()
     this.selected = null
   }
 
   componentDidMount() {
     this.initMap()
-    this.measureTooltipRef = React.createRef()
-    this.tooltipRef = React.createRef()
   }
 
   componentDidUpdate(prevProps) {
@@ -48,12 +50,15 @@ export class MapWrapper extends React.Component {
   }
 
   render() {
+    const selectedHarbour = this.state.hoveredHarbourFeature ? this.state.hoveredHarbourFeature.harbour : null
     return (
-      <div className={`map-wrapper ${this.props.mode}`}>
+      <div className={`map-wrapper ${this.props.mode} ${this.state.hovering ? 'hover' : ''}`}>
         <div id="map" />
         <div>{this.state.measurements.map(({feature, tooltipRef}, i) => <div key={i}><div ref={tooltipRef} className='map-tooltip-measure map-tooltip-measure--old'>{formatLength(feature.getGeometry())}</div></div>)}</div>
         <div ref={this.measureTooltipRef} className='map-tooltip-measure'></div>
-        <div ref={this.tooltipRef} className='map-tooltip'></div>
+        <div ref={this.tooltipRef} className='map-tooltip'>
+          <div>{selectedHarbour ? selectedHarbour.name : ''}</div>
+        </div>
       </div>
     )
   }
@@ -87,20 +92,19 @@ export class MapWrapper extends React.Component {
       image: new Icon({
         anchor: [0.5, 1],
         anchorXUnits: 'fraction',
-        src: 'pin.svg',
+        src: '/pin.svg',
         scale: 1
       })
     })
-    const pinMarker = new Feature({})
-    pinMarker.setStyle(pinIconStyle)
-    pinMarker.setStyle((feature, resolution) => {
+    this.pinMarker = new Feature({})
+    this.pinMarker.setStyle((feature, resolution) => {
       pinIconStyle.getImage().setScale(1/Math.pow(resolution, 1/7) * 5)
       return pinIconStyle
     })
 
     const markerLayer = new VectorLayer({
       source: new VectorSource({
-        features: [pinMarker]
+        features: [this.pinMarker]
       }),
       zIndex: 1001,
     })
@@ -112,24 +116,63 @@ export class MapWrapper extends React.Component {
         const coordinates = fromLonLat([value.longitude, value.latitude])
         this.map.getView().setCenter(coordinates)
         this.map.getView().setZoom(14)
-        pinMarker.setGeometry(new Point(coordinates))
+        this.pinMarker.setGeometry(new Point(coordinates))
         return
       }
       console.log(`Unknown map event type ${type}`)
     })
 
-
-    function updateHash() {
-      const view = this.map.getView()
-      const center = view.getCenter()
-      const [longitude, latitude] = toLonLat(center)
-      const zoom = Math.round(view.getZoom())
-      window.history.pushState(null, null, `#${latitude.toFixed(4)}/${longitude.toFixed(4)}/${zoom}`)
-    }
-
-    this.map.on('moveend', updateHash.bind(this))
-
     placeOfficialHarbourMarkers(this.map)
+
+    this.tooltipOverlay = new Overlay({
+      element: this.tooltipRef.current,
+      offset: [0, -15],
+      positioning: 'bottom-center'
+    })
+
+    this.map.addOverlay(this.tooltipOverlay)
+
+    this.map.on('click', this.onMapClick.bind(this))
+    this.map.on('pointermove', this.onPointerMove.bind(this))
+    this.map.on('moveend', this.updateHash.bind(this))
+
+  }
+
+  onMapClick() {
+    this.pinMarker.setGeometry(null)
+  }
+
+  onPointerMove(e) {
+    if (!e.dragging) {
+      const pixel = this.map.getEventPixel(e.originalEvent)
+      const features = this.map.getFeaturesAtPixel(pixel, {hitTolerance: 3})
+      const harbourFeatures = features.filter(f => Boolean(f.harbour))
+      const hasHarbourFeatures = Boolean(harbourFeatures.length)
+      if (hasHarbourFeatures !== this.state.hovering) {
+        this.setState({hovering: hasHarbourFeatures})
+      }
+
+      if (hasHarbourFeatures) {
+        if (harbourFeatures[0] !== this.state.hoveredHarbourFeature) {
+          this.setState({hoveredHarbourFeature: harbourFeatures[0]})
+          this.tooltipOverlay.setPosition(harbourFeatures[0].getGeometry().getCoordinates())
+        }
+      } else {
+        if (this.state.hoveredHarbourFeature) {
+          this.setState({hoveredHarbourFeature: null})
+          this.tooltipOverlay.setPosition(null)
+        }
+        return
+      }
+    }
+  }
+
+  updateHash() {
+    const view = this.map.getView()
+    const center = view.getCenter()
+    const [longitude, latitude] = toLonLat(center)
+    const zoom = Math.round(view.getZoom())
+    window.history.pushState(null, null, `#${latitude.toFixed(4)}/${longitude.toFixed(4)}/${zoom}`)
   }
 
   clearMesaurement() {
@@ -225,9 +268,7 @@ export class MapWrapper extends React.Component {
         tooltipRef
       }])
       this.setState({measurements})
-      setTimeout(() => {
-        tooltip.setElement(tooltipRef.current)
-      }, 1)
+      setTimeout(() => tooltip.setElement(tooltipRef.current), 1)
       unByKey(listener)
     })
   }
@@ -288,6 +329,7 @@ function placeOfficialHarbourMarkers(olMap) {
     const marker = new Feature({
       geometry: new Point(fromLonLat([harbour.longitude, harbour.latitude])),
     })
+    marker.harbour = harbour
 
     marker.setStyle((feature, resolution) => {
       iconStyle.getImage().setScale(1/Math.pow(resolution, 1/4) * 5)

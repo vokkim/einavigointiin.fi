@@ -72,7 +72,7 @@ export class MeasurementIcon extends React.Component {
 
   render() {
     return (
-      <svg width="35px" height="20px" viewBox="0 0 47 24" version="1.1">
+      <svg className="icon icon--measurement" width="35px" height="20px" viewBox="0 0 47 24" version="1.1">
         <g stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
           <g>
             <path d="M4,0 L43,0 C45.209139,-4.05812251e-16 47,1.790861 47,4 L47,11 L0,11 L0,4 C-2.705415e-16,1.790861 1.790861,4.05812251e-16 4,0 Z" fill="#D8D8D8"></path>
