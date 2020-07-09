@@ -182,6 +182,7 @@ export class MapWrapper extends React.Component {
       this.map.removeOverlay(tooltip)
     })
     this.setState({measurements: []})
+    this.currentMeasureTooltip.setPosition(null)
     this.measurementLayer = null
     this.draw = null
   }
@@ -222,7 +223,6 @@ export class MapWrapper extends React.Component {
         }),
         stroke: new Stroke({
           color: '#35abff',
-          lineDash: [20, 10],
           width: 3
         }),
         image: new CircleStyle({
