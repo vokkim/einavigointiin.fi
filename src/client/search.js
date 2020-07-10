@@ -52,7 +52,12 @@ function optionFormatter({value}, {inputValue}) {
   const idxSwedish = ((value.name_swedish || '').toLowerCase()).indexOf(trimmedInput)
   const secondaryText = value.secondary_text
   const label = idxSwedish > idxFinnish ? value.name_swedish : value.name_finnish || value.name_swedish
-  return <div className="search__value">{getIconForType(value.type)}<span>{label}</span> <span className="search__value--secondaryText">{secondaryText}</span></div>
+  return (
+    <div className="search__value">{getIconForType(value.type)}
+      <span>{label}</span> <span className="search__value--secondaryText">{secondaryText}</span>
+      {value.harbour_number && <span className="search__value--harbourNumber">{value.harbour_number}</span>}
+    </div>
+  )
 }
 
 class IndicatorsContainer extends React.Component {

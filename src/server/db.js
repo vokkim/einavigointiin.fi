@@ -15,6 +15,7 @@ async function searchLocations(search, views = []) {
         secondary_text,
         ST_X(wkb_geometry) as longitude,
         ST_Y(wkb_geometry) as latitude,
+        harbour_number,
         priority
         FROM (
           SELECT
@@ -22,6 +23,7 @@ async function searchLocations(search, views = []) {
             INITCAP(teksti_fin) as name_finnish,
             INITCAP(teksti_swe) as name_swedish,
             wkb_geometry,
+            NULL as harbour_number,
             municipality as secondary_text,
             kirjasinkoko,
             CASE WHEN (starts_with(LOWER(concat(teksti_fin, '')), $2) OR starts_with(LOWER(concat(teksti_swe, '')), $2)) IS TRUE THEN 3 ELSE 4 END as priority
@@ -32,7 +34,8 @@ async function searchLocations(search, views = []) {
             INITCAP(name) as name_finnish,
             INITCAP(name) as name_swedish,
             wkb_geometry,
-            harbour_number::varchar as secondary_text,
+            harbour_number as harbour_number,
+            municipality as secondary_text,
             400 as kirjasinkoko,
             1 as priority
           FROM harbours WHERE (name ILIKE $1 OR harbour_number::varchar = $2) AND (type = 'official_harbour' OR view = ANY($3::uuid[]))
