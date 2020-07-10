@@ -6,16 +6,17 @@ const settings = require('./settings')
 const db = require('./db')
 const chartRoutes = require('./chart-routes')
 
+const INDEX_CONTENT = fs.readFileSync(path.join(__dirname, '../../dist/index.html')).toString('utf-8')
+
 const app = express()
 
 app.disable('x-powered-by')
 app.use('/map', chartRoutes)
 
 app.get('/', async (req, res) => {
-  const index = await Promise.promisify(fs.readFile)(path.join(__dirname, '../../dist/index.html'))
   const harbours = await db.getHarbours(['official_harbour'])
   res.set('Cache-Control', 'public, max-age=86400')
-  res.send(index.toString('utf-8').replace('HARBOUR_DATA', 'HARBOUR_DATA='+JSON.stringify(harbours)))
+  res.send(renderIndex(harbours))
 })
 
 app.get('/view/:key/', async (req, res) => {
@@ -26,10 +27,9 @@ app.get('/view/:key/', async (req, res) => {
   if (!view) {
     return res.sendStatus(404)
   }
-  const index = await Promise.promisify(fs.readFile)(path.join(__dirname, '../../dist/index.html'))
   const harbours = await db.getHarbours(['official_harbour'], [view.id])
   res.set('Cache-Control', 'public, max-age=86400')
-  res.send(index.toString('utf-8').replace('HARBOUR_DATA', 'HARBOUR_DATA='+JSON.stringify(harbours)))
+  res.send(renderIndex(harbours))
 })
 
 app.get('(/view/:key)?/search/:search', async (req, res) => {
@@ -52,6 +52,12 @@ app.get('(/view/:key)?/search/:search', async (req, res) => {
 app.use('/', express.static(path.join(__dirname, '../../dist')))
 app.use('/', express.static(path.join(__dirname, '../../assets')))
 
+function renderIndex(harbours) {
+  return INDEX_CONTENT
+    .toString('utf-8')
+    .replace('HARBOUR_DATA', 'HARBOUR_DATA='+JSON.stringify(harbours))
+    .replace(/GTAG-ID/g, process.env.GTAG_ID || '')
+}
 
 function findView(key) {
   if (!validateViewKey(key)) {
