@@ -17,6 +17,13 @@ new MBTiles(path.resolve(settings.chartsPath, 'merikartat.mbtiles'), (err, db) =
   }
 })
 
+api.get('/satellite/:z/:x/:y.jpg', (req, res) => {
+  const {z, x, y} = req.params
+  const url = `http://karttamoottori.maanmittauslaitos.fi/maasto/wmts/1.0.0/ortokuva/default/ETRS-TM35FIN/${z}/${y}/${x}.jpg`
+  const fwdRequest = request({url, headers: {'Referer': ''}}).on('error', () => {})
+  req.pipe(fwdRequest).pipe(res)
+})
+
 api.get('/:z/:x/:y', (req, res) => {
   const {z, x, y} = req.params
   if (!tiles) {

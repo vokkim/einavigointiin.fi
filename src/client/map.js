@@ -1,12 +1,9 @@
 import React from 'react'
-import _ from 'lodash'
 import 'ol/ol.css'
 import {Map, View} from 'ol'
 import {defaults} from 'ol/interaction'
 import MouseWheelZoom from 'ol/interaction/MouseWheelZoom'
-import {Tile as TileLayer, Vector as VectorLayer} from 'ol/layer'
-import {transformExtent} from 'ol/proj'
-import XYZ from 'ol/source/XYZ'
+import {Vector as VectorLayer} from 'ol/layer'
 import {fromLonLat, toLonLat} from 'ol/proj'
 import Feature from 'ol/Feature'
 import Point from 'ol/geom/Point'
@@ -14,16 +11,16 @@ import VectorSource from 'ol/source/Vector'
 import {Icon, Style} from 'ol/style'
 import {MAX_ZOOM, MIN_ZOOM, M_TO_NM} from './enums'
 import {getIconForHarbour} from './map-icons'
-
 import {getLength} from 'ol/sphere'
 import Draw from 'ol/interaction/Draw'
 import {Circle as CircleStyle, Fill, Stroke} from 'ol/style'
 import {unByKey} from 'ol/Observable'
 import Overlay from 'ol/Overlay'
+import {addCharts} from './map-charts'
 
 export const MAP_MODE = {MEASURE: 'measure', NORMAL: 'normal'}
-export class MapWrapper extends React.Component {
 
+export class MapWrapper extends React.Component {
   constructor(props) {
     super(props)
     this.state = {measurements: [], hoveredHarbourFeature: null, hovering: false}
@@ -76,6 +73,7 @@ export class MapWrapper extends React.Component {
         pinchRotate: false
       }),
       view: new View({
+        projection: 'EPSG:3857',
         center,
         zoom,
         minZoom: MIN_ZOOM,
@@ -86,7 +84,7 @@ export class MapWrapper extends React.Component {
     const mouseWheelZoom = new MouseWheelZoom({useAnchor: true})
     this.map.addInteraction(mouseWheelZoom)
 
-    addCharts(this.map, settings.charts)
+    addCharts(this.map)
 
     const pinIconStyle = new Style({
       image: new Icon({
@@ -134,9 +132,12 @@ export class MapWrapper extends React.Component {
 
     this.map.on('click', this.onMapClick.bind(this))
     this.map.on('pointermove', this.onPointerMove.bind(this))
-    this.map.on('moveend', this.updateHash.bind(this))
+    this.map.on('moveend', () => {
+      this.updateHash()
+    })
 
   }
+
 
   onMapClick() {
     this.pinMarker.setGeometry(null)
@@ -216,6 +217,7 @@ export class MapWrapper extends React.Component {
 
     this.draw = new Draw({
       source: source,
+      stopClick: true,
       type: 'LineString',
       style: new Style({
         fill: new Fill({
@@ -281,42 +283,6 @@ function getChartOptions(settings) {
     return {center, zoom: hashParts[2]}
   }
   return {center: fromLonLat([22.96,59.82]), zoom: settings.zoom}
-}
-
-function addCharts(map, charts) {
-  // Initialize charts based on initial charts
-  _.each(charts, chart => {
-    const {index, opacity, maxzoom, minzoom, tilemapUrl} = chart
-
-    const extent = getChartExtent(chart)
-
-    const source = new XYZ({
-      url: tilemapUrl,
-      maxZoom: maxzoom,
-      minZoom: minzoom,
-      tilePixelRatio: window.devicePixelRatio === 2 ? 2 : 1
-    })
-
-    const layer = new TileLayer({
-      source,
-      extent,
-      zIndex: index,
-      opacity
-    })
-
-    map.addLayer(layer)
-  })
-}
-
-function getChartExtent(provider) {
-  if (!provider.bounds) {
-    return undefined
-  }
-  if (!_.isArray(provider.bounds) || provider.bounds.length !== 4) {
-    throw new Error('Unrecognized bounds format: ' + JSON.stringify(provider.bounds))
-  }
-
-  return transformExtent(provider.bounds, 'EPSG:4326', 'EPSG:3857')
 }
 
 function placeOfficialHarbourMarkers(olMap) {

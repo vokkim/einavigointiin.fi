@@ -26,6 +26,7 @@
     "lodash": "4.17.15",
     "ol": "6.3.1",
     "pg-promise": "10.5.7",
+    "proj4": "2.6.2",
     "react": "16.13.1",
     "react-dom": "16.13.1",
     "react-select": "3.1.0",

@@ -8,21 +8,9 @@ const defaultSettings = {
   follow: true
 }
 
-const charts = [
-  {
-    index: 2,
-    name: 'sea',
-    maxzoom: 15,
-    minzoom: 5,
-    opacity: 1,
-    tilemapUrl: '/map/{z}/{x}/{y}',
-    //bounds: [19.105224609375,59.645540251443215,27.88330078125,65.84776766596988]
-  }
-]
-
 const fromLocalStorage = Store.get(LOCAL_STORAGE_KEY) || {}
 
-const settings = {...defaultSettings, ...fromLocalStorage, charts}
+const settings = {...defaultSettings, ...fromLocalStorage}
 
 function clearSettingsFromLocalStorage() {
   Store.remove(LOCAL_STORAGE_KEY)
