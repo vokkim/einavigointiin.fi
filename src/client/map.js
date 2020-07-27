@@ -8,6 +8,7 @@ import {fromLonLat, toLonLat} from 'ol/proj'
 import Feature from 'ol/Feature'
 import Point from 'ol/geom/Point'
 import VectorSource from 'ol/source/Vector'
+import {ScaleLine} from 'ol/control'
 import {Icon, Style} from 'ol/style'
 import {MAX_ZOOM, MIN_ZOOM, M_TO_NM} from './enums'
 import {getIconForHarbour} from './map-icons'
@@ -64,9 +65,14 @@ export class MapWrapper extends React.Component {
     console.log('Init map')
     const {settings, events} = this.props
     const {center, zoom} = getChartOptions(settings)
+
+    const scaleLine = new ScaleLine({
+      units: 'nautical'
+    })
+
     this.map = new Map({
       target: 'map',
-      controls: [],
+      controls: [scaleLine],
       layers: [],
       interactions: defaults({
         mouseWheelZoom: false,
