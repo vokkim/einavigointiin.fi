@@ -4,13 +4,15 @@ import {Map, View} from 'ol'
 import {defaults} from 'ol/interaction'
 import MouseWheelZoom from 'ol/interaction/MouseWheelZoom'
 import {Vector as VectorLayer} from 'ol/layer'
+import Geolocation from 'ol/Geolocation'
 import {fromLonLat, toLonLat} from 'ol/proj'
+import {setFollow, setGeolocationStatus} from './store'
 import Feature from 'ol/Feature'
 import Point from 'ol/geom/Point'
 import VectorSource from 'ol/source/Vector'
 import {ScaleLine} from 'ol/control'
 import {Icon, Style} from 'ol/style'
-import {MAX_ZOOM, MIN_ZOOM, M_TO_NM} from './enums'
+import {MAX_ZOOM, MIN_ZOOM, M_TO_NM, MAP_MODE, GEOLOCATION_STATUS} from './enums'
 import {getIconForHarbour} from './map-icons'
 import {getLength} from 'ol/sphere'
 import Draw from 'ol/interaction/Draw'
@@ -18,8 +20,6 @@ import {Circle as CircleStyle, Fill, Stroke} from 'ol/style'
 import {unByKey} from 'ol/Observable'
 import Overlay from 'ol/Overlay'
 import {addCharts} from './map-charts'
-
-export const MAP_MODE = {MEASURE: 'measure', NORMAL: 'normal'}
 
 export class MapWrapper extends React.Component {
   constructor(props) {
@@ -30,27 +30,67 @@ export class MapWrapper extends React.Component {
     this.currentMeasurement = null
     this.tooltipOverlay = null
     this.pinMarker = null
+    this.myLocationMarker = null
     this.tooltipRef = React.createRef()
     this.measureTooltipRef = React.createRef()
     this.selected = null
+    this.mouseWheelZoomInteraction = null
+    this.positionAccuracyFeature = new Feature()
+    this.positionFeature = new Feature()
+
+    const myLocationIconStyle = new Style({
+      image: new Icon({
+        anchor: [0.5, 0.5],
+        anchorXUnits: 'fraction',
+        src: '/my-location.svg',
+        scale: 1
+      })
+    })
+    this.positionFeature.setStyle((feature, resolution) => {
+      myLocationIconStyle.getImage().setScale(1/Math.pow(resolution, 1/5) * 3)
+      return myLocationIconStyle
+    })
+
+    const positionAccuracyStyle = new Style({
+      stroke: new Stroke({
+        color: 'rgb(219, 45, 151, 0.9)',
+        width: 1
+      }),
+      fill: new Fill({
+        color: 'rgb(219, 45, 151, 0.35)'
+      })
+    })
+
+    this.positionAccuracyFeature.setStyle(positionAccuracyStyle)
   }
 
   componentDidMount() {
     this.initMap()
+    if (this.props.follow) {
+      this.initFollow()
+    }
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.mode === MAP_MODE.NORMAL && prevProps.mode === MAP_MODE.MEASURE) {
-      this.clearMesaurement()
-    } else if (this.props.mode === MAP_MODE.MEASURE && prevProps.mode === MAP_MODE.NORMAL) {
+    const {mapMode} = this.props
+    const {mapMode: previousMapMode} = prevProps
+    if (mapMode === MAP_MODE.NORMAL && previousMapMode === MAP_MODE.MEASURE) {
+      this.clearMeasurement()
+    } else if (mapMode === MAP_MODE.MEASURE && previousMapMode === MAP_MODE.NORMAL) {
       this.initMeasurement()
+    }
+
+    if (this.props.follow && !prevProps.follow) {
+      this.initFollow()
+    } else if (!this.props.follow && prevProps.follow) {
+      this.cancelFollow()
     }
   }
 
   render() {
     const selectedHarbour = this.state.hoveredHarbourFeature ? this.state.hoveredHarbourFeature.harbour : null
     return (
-      <div className={`map-wrapper ${this.props.mode} ${this.state.hovering ? 'hover' : ''}`}>
+      <div className={`map-wrapper ${this.props.mapMode} ${this.state.hovering ? 'hover' : ''}`}>
         <div id="map" />
         <div>{this.state.measurements.map(({feature, tooltipRef}, i) => <div key={i}><div ref={tooltipRef} className='map-tooltip-measure map-tooltip-measure--old'>{formatLength(feature.getGeometry())}</div></div>)}</div>
         <div ref={this.measureTooltipRef} className='map-tooltip-measure'></div>
@@ -63,8 +103,8 @@ export class MapWrapper extends React.Component {
 
   initMap() {
     console.log('Init map')
-    const {settings, events} = this.props
-    const {center, zoom} = getChartOptions(settings)
+    const {events} = this.props
+    const {center, zoom} = getChartOptions(this.props)
 
     const scaleLine = new ScaleLine({
       units: 'nautical'
@@ -87,8 +127,9 @@ export class MapWrapper extends React.Component {
       })
     })
 
-    const mouseWheelZoom = new MouseWheelZoom({useAnchor: true})
-    this.map.addInteraction(mouseWheelZoom)
+    this.mouseWheelZoomInteraction = new MouseWheelZoom({useAnchor: true})
+
+    this.map.addInteraction(this.mouseWheelZoomInteraction)
 
     addCharts(this.map)
 
@@ -108,7 +149,7 @@ export class MapWrapper extends React.Component {
 
     const markerLayer = new VectorLayer({
       source: new VectorSource({
-        features: [this.pinMarker]
+        features: [this.pinMarker, this.positionAccuracyFeature, this.positionFeature]
       }),
       zIndex: 1001,
     })
@@ -138,12 +179,17 @@ export class MapWrapper extends React.Component {
 
     this.map.on('click', this.onMapClick.bind(this))
     this.map.on('pointermove', this.onPointerMove.bind(this))
-    this.map.on('moveend', () => {
-      this.updateHash()
+    this.map.on('moveend', this.onMoveEnd.bind(this))
+    this.map.on('pointerdrag', () => {
+      if (this.props.follow && this.props.geolocationStatus === GEOLOCATION_STATUS.OK) {
+        setFollow(false)
+      }
     })
-
   }
 
+  onMoveEnd() {
+    this.updateHash()
+  }
 
   onMapClick() {
     this.pinMarker.setGeometry(null)
@@ -182,14 +228,14 @@ export class MapWrapper extends React.Component {
     window.history.pushState(null, null, `#${latitude.toFixed(4)}/${longitude.toFixed(4)}/${zoom}`)
   }
 
-  clearMesaurement() {
+  clearMeasurement() {
     this.map.removeLayer(this.measurementLayer)
     this.map.removeInteraction(this.draw)
     this.state.measurements.forEach(({tooltip}) => {
       this.map.removeOverlay(tooltip)
     })
     this.setState({measurements: []})
-    this.currentMeasureTooltip.setPosition(null)
+    this.currentMeasureTooltip && this.currentMeasureTooltip.setPosition(null)
     this.measurementLayer = null
     this.draw = null
   }
@@ -280,15 +326,70 @@ export class MapWrapper extends React.Component {
       unByKey(listener)
     })
   }
+
+  initFollow() {
+    const view = this.map.getView()
+    setGeolocationStatus(GEOLOCATION_STATUS.LOADING)
+    if (this.geolocation) {
+      const currentGeometry = this.positionFeature.getGeometry()
+      if (this.positionFeature.getGeometry()) {
+        view.setCenter(currentGeometry.getCoordinates())
+      }
+      return
+    }
+
+    this.geolocation = new Geolocation({
+      trackingOptions: {
+        enableHighAccuracy: true,
+        timeout: 5000,
+        maximumAge: 0
+      },
+      projection: view.getProjection()
+    })
+
+    this.geolocation.setTracking(true)
+
+    this.geolocation.on('change', () => {
+      const accuracy = this.geolocation.getAccuracy()
+      if (accuracy > 200) {
+        this.clearPositionMarker()
+        setGeolocationStatus(GEOLOCATION_STATUS.ERROR)
+        return
+      }
+      const accuracyGeometry = this.geolocation.getAccuracyGeometry()
+      const coordinates = this.geolocation.getPosition()
+      this.positionAccuracyFeature.setGeometry(accuracyGeometry)
+      this.positionFeature.setGeometry(coordinates ? new Point(coordinates) : null)
+      if (this.props.follow) {
+        this.mouseWheelZoomInteraction.setMouseAnchor(false)
+        view.setCenter(coordinates)
+        setGeolocationStatus(GEOLOCATION_STATUS.OK)
+      }
+    })
+
+    this.geolocation.on('error', () => {
+      setGeolocationStatus(GEOLOCATION_STATUS.ERROR)
+      this.clearPositionMarker()
+    })
+  }
+
+  clearPositionMarker() {
+    this.positionFeature.setGeometry(null)
+    this.positionAccuracyFeature.setGeometry(null)
+  }
+
+  cancelFollow() {
+    this.mouseWheelZoomInteraction.setMouseAnchor(true)
+  }
 }
 
-function getChartOptions(settings) {
+function getChartOptions({zoom}) {
   const hashParts = (window.location.hash || '#').substring(1).split('/').map(parseFloat)
   if (hashParts.length === 3 && hashParts.every(v => isFinite(v))) {
     const center = fromLonLat([hashParts[1], hashParts[0]])
     return {center, zoom: hashParts[2]}
   }
-  return {center: fromLonLat([22.96,59.82]), zoom: settings.zoom}
+  return {center: fromLonLat([22.96, 59.82]), zoom}
 }
 
 function placeOfficialHarbourMarkers(olMap) {

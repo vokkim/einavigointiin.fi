@@ -103,6 +103,29 @@ export class MeasurementIcon extends React.Component {
   }
 }
 
+export class LocationIcon extends React.Component {
+  shouldComponentUpdate() {
+    return false
+  }
+
+  render() {
+    return (
+      <svg className="icon icon--location" width="30px" height="30px" viewBox="0 0 30 30">
+        <g stroke="none" strokeWidth="2" fill="none" fillRule="evenodd">
+          <g>
+            <circle fill="#D8D8D8" cx="15" cy="15" r="6"></circle>
+            <circle stroke="#D8D8D8" cx="15" cy="15" r="13"></circle>
+            <path d="M15,2 L15,0.5" stroke="#D8D8D8" strokeLinecap="square"></path>
+            <path d="M15,29.5 L15,28" stroke="#D8D8D8" strokeLinecap="square"></path>
+            <path d="M28.5965004,16.0717267 L28.5965004,14.5717267" stroke="#D8D8D8" strokeLinecap="square" transform="translate(28.596500, 15.168227) rotate(-90.000000) translate(-28.596500, -15.168227) "></path>
+            <path d="M1,16.1682271 L1,14.6682271" stroke="#D8D8D8" strokeLinecap="square" transform="translate(1.000000, 15.168227) rotate(-90.000000) translate(-1.000000, -15.168227) "></path>
+          </g>
+        </g>
+      </svg>
+    )
+  }
+}
+
 export class MerikarhuHarbourIcon extends React.Component {
   shouldComponentUpdate() {
     return false

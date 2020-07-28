@@ -57,8 +57,28 @@ button {
   }
 }
 
-.topbar__button {
-  margin: 0px 15px;
+@toolbarBorderRadius: 3px;
+.toolbar {
+  position: absolute;
+  left: 0;
+  z-index: 1111;
+  top: @topBarHeight + 150px;
+  background: @topbarBackgroundColor;
+  border-top-right-radius: @toolbarBorderRadius;
+  border-bottom-right-radius: @toolbarBorderRadius;
+
+  .toolbar__button:first-child {
+    border-top-right-radius: @toolbarBorderRadius;
+  }
+  .toolbar__button:last-child {
+    border-bottom-right-radius: @toolbarBorderRadius;
+  }
+}
+
+.toolbar__button {
+  position: relative;
+  display: block;
+  margin: 0;
   width: @topBarHeight;
   height: @topBarHeight;
   &.active {
@@ -70,6 +90,15 @@ button {
       }
       polyline {
         stroke: @measurementColor;
+      }
+    }
+
+    .icon--location {
+      path, circle {
+        stroke: @measurementColor;
+      }
+      circle:first-child {
+        fill: @measurementColor;
       }
     }
   }
@@ -88,7 +117,7 @@ button {
 #search {
   padding: 5px;
   max-width: 400px;
-  margin-left: 20px;
+  margin: 0 10px;
   flex: 1 0 auto;
 }
 
@@ -223,3 +252,22 @@ button {
     font-size: 11px;
   }
 }
+
+.toolbar__button.active {
+  &.toolbar__button--geolocation-error {
+    background: rgba(195, 48, 48, 0.5);
+  }
+  &.toolbar__button--geolocation-loading {
+    svg {
+      opacity: 0.5;
+    }
+    &:after {
+      content: url(../spinner.svg);
+      position: absolute;
+      left: 4px;
+      top: 3px;
+      opacity: 1;
+    }
+  }
+}
+
