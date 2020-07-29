@@ -146,3 +146,26 @@ export class MerikarhuHarbourIcon extends React.Component {
     )
   }
 }
+
+export class TrashIcon extends React.Component {
+  shouldComponentUpdate() {
+    return false
+  }
+
+  render() {
+    return (
+      <svg className="icon icon--trash" width="25px" height="25px" viewBox="0 0 25 31">
+        <g stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
+          <g transform="translate(1.000000, 1.000000)" stroke="#D8D8D8" strokeWidth="2">
+            <path d="M0,4.5 L23,4.5" strokeLinecap="round"></path>
+            <path d="M0.5,4.5 L0.5,24.8316815 C0.5,27.0408205 2.290861,28.8316815 4.5,28.8316815 L18.5,28.8316815 C20.709139,28.8316815 22.5,27.0408205 22.5,24.8316815 L22.5,4.5" strokeLinecap="round"></path>
+            <path d="M5.5,12.5 L5.5,24.9283653" strokeLinecap="round"></path>
+            <path d="M17.5,12.5 L17.5,24.9283653" strokeLinecap="round"></path>
+            <path d="M11.5,12.5 L11.5,24.9283653" strokeLinecap="round"></path>
+            <path d="M6,5.04377701 L6,2 C6,0.8954305 6.8954305,2.02906125e-16 8,0 L15.1641849,0 C16.2687544,-1.18396092e-15 17.1641849,0.8954305 17.1641849,2 L17.1641849,5.04377701"></path>
+          </g>
+        </g>
+      </svg>
+    )
+  }
+}

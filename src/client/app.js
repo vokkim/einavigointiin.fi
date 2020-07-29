@@ -2,9 +2,9 @@ import React from 'react'
 import {render} from 'react-dom'
 import {Bus} from 'baconjs'
 import {MapWrapper} from './map'
-import {state, setMapMode, setFollow} from './store'
+import {state, setMapMode, setFollow, setMeasurements} from './store'
 import Search from './search'
-import {MeasurementIcon, LocationIcon} from './icons'
+import {MeasurementIcon, LocationIcon, TrashIcon} from './icons'
 import {MAP_MODE} from './enums'
 
 const mapEventBus = new Bus()
@@ -16,11 +16,15 @@ function onSearchSelect(e) {
 class ToolbarButton extends React.Component {
   render() {
     return (
-      <button
-        className={`toolbar__button ${this.props.active ? 'active' : ''} ${this.props.className || ''}`}
-        onClick={this.props.onClick}>
-        {this.props.children}
-      </button>
+      <div className="toolbar__buttonwrapper">
+        <button
+          className={`toolbar__button ${this.props.active ? 'active' : ''} ${this.props.className || ''}`}
+          disabled={this.props.disabled}
+          onClick={this.props.onClick}>
+          {this.props.children}
+        </button>
+        {this.props.active && (this.props.secondaryButtons || [])}
+      </div>
     )
   }
 }
@@ -39,6 +43,7 @@ class App extends React.Component {
     if (!this.state.mapMode) {
       return <div></div>
     }
+    const measurementMode = this.state.mapMode === MAP_MODE.MEASURE
     return (
       <div>
         <div className="topbar">
@@ -46,10 +51,21 @@ class App extends React.Component {
         </div>
         <div className="toolbar">
           <ToolbarButton
-            active={this.state.mapMode === MAP_MODE.MEASURE}
-            onClick={this.toggleMeasurementMode.bind(this)}>
+            active={measurementMode}
+            onClick={this.toggleMeasurementMode.bind(this)}
+            secondaryButtons={[
+              <ToolbarButton
+                key={1}
+                className="toolbar__button--secondary"
+                onClick={() => setMeasurements([])}
+                disabled={this.state.measurements.length === 0}>
+                <TrashIcon />
+              </ToolbarButton>
+            ]}>
             <MeasurementIcon />
           </ToolbarButton>
+
+
           <ToolbarButton
             active={this.state.follow}
             className={`toolbar__button--geolocation-${this.state.geolocationStatus}`}

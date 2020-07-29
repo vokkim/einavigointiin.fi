@@ -6,7 +6,7 @@ import MouseWheelZoom from 'ol/interaction/MouseWheelZoom'
 import {Vector as VectorLayer} from 'ol/layer'
 import Geolocation from 'ol/Geolocation'
 import {fromLonLat, toLonLat} from 'ol/proj'
-import {setFollow, setGeolocationStatus} from './store'
+import {setFollow, setGeolocationStatus, setMeasurements} from './store'
 import Feature from 'ol/Feature'
 import Point from 'ol/geom/Point'
 import VectorSource from 'ol/source/Vector'
@@ -24,7 +24,7 @@ import {addCharts} from './map-charts'
 export class MapWrapper extends React.Component {
   constructor(props) {
     super(props)
-    this.state = {measurements: [], hoveredHarbourFeature: null, hovering: false}
+    this.state = {hoveredHarbourFeature: null, hovering: false}
     this.measuringInteraction = null
     this.currentMeasureTooltip = null
     this.currentMeasurement = null
@@ -72,10 +72,14 @@ export class MapWrapper extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    const {mapMode} = this.props
-    const {mapMode: previousMapMode} = prevProps
+    const {mapMode, measurements} = this.props
+    const {mapMode: previousMapMode, measurements: previousMeasurements} = prevProps
+    if (measurements.length === 0 && previousMeasurements.length > 0) {
+      this.clearMeasurements(previousMeasurements)
+      this.initMeasurement()
+    }
     if (mapMode === MAP_MODE.NORMAL && previousMapMode === MAP_MODE.MEASURE) {
-      this.clearMeasurement()
+      this.clearMeasurements(previousMeasurements)
     } else if (mapMode === MAP_MODE.MEASURE && previousMapMode === MAP_MODE.NORMAL) {
       this.initMeasurement()
     }
@@ -92,7 +96,7 @@ export class MapWrapper extends React.Component {
     return (
       <div className={`map-wrapper ${this.props.mapMode} ${this.state.hovering ? 'hover' : ''}`}>
         <div id="map" />
-        <div>{this.state.measurements.map(({feature, tooltipRef}, i) => <div key={i}><div ref={tooltipRef} className='map-tooltip-measure map-tooltip-measure--old'>{formatLength(feature.getGeometry())}</div></div>)}</div>
+        <div>{this.props.measurements.map(({feature, tooltipRef}, i) => <div key={i}><div ref={tooltipRef} className='map-tooltip-measure map-tooltip-measure--old'>{formatLength(feature.getGeometry())}</div></div>)}</div>
         <div ref={this.measureTooltipRef} className='map-tooltip-measure'></div>
         <div ref={this.tooltipRef} className='map-tooltip'>
           <div>{selectedHarbour ? selectedHarbour.name : ''}</div>
@@ -228,13 +232,12 @@ export class MapWrapper extends React.Component {
     window.history.pushState(null, null, `#${latitude.toFixed(4)}/${longitude.toFixed(4)}/${zoom}`)
   }
 
-  clearMeasurement() {
+  clearMeasurements(measurements) {
     this.map.removeLayer(this.measurementLayer)
     this.map.removeInteraction(this.draw)
-    this.state.measurements.forEach(({tooltip}) => {
+    measurements.forEach(({tooltip}) => {
       this.map.removeOverlay(tooltip)
     })
-    this.setState({measurements: []})
     this.currentMeasureTooltip && this.currentMeasureTooltip.setPosition(null)
     this.measurementLayer = null
     this.draw = null
@@ -316,12 +319,12 @@ export class MapWrapper extends React.Component {
     this.draw.on('drawend', () => {
       const tooltipRef = React.createRef()
       const tooltip = this.currentMeasureTooltip
-      const measurements = this.state.measurements.concat([{
+      const measurements = this.props.measurements.concat([{
         feature: this.currentMeasurement,
         tooltip,
         tooltipRef
       }])
-      this.setState({measurements})
+      setMeasurements(measurements)
       setTimeout(() => tooltip.setElement(tooltipRef.current), 1)
       unByKey(listener)
     })

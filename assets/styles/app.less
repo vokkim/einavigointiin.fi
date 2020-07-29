@@ -45,12 +45,8 @@ body {
 
 button {
   border: none;
-  background: @topbarBackgroundColor;
   padding: 5px 5px;
   transition: background 150ms;
-  &:hover {
-    background: lighten(@topbarBackgroundColor, 4);
-  }
   &:focus {
     outline: none;
     border: none;
@@ -63,24 +59,28 @@ button {
   left: 0;
   z-index: 1111;
   top: @topBarHeight + 150px;
-  background: @topbarBackgroundColor;
-  border-top-right-radius: @toolbarBorderRadius;
-  border-bottom-right-radius: @toolbarBorderRadius;
-
-  .toolbar__button:first-child {
-    border-top-right-radius: @toolbarBorderRadius;
-  }
-  .toolbar__button:last-child {
-    border-bottom-right-radius: @toolbarBorderRadius;
-  }
 }
 
+.toolbar__buttonwrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
 .toolbar__button {
   position: relative;
   display: block;
   margin: 0;
   width: @topBarHeight;
   height: @topBarHeight;
+
+  background: @topbarBackgroundColor;
+  &:hover {
+    background: lighten(@topbarBackgroundColor, 4);
+  }
+  &:disabled:hover {
+    background: @topbarBackgroundColor;
+  }
+
   &.active {
     background: lighten(@topbarBackgroundColor, 8);
 
@@ -92,7 +92,14 @@ button {
         stroke: @measurementColor;
       }
     }
-
+    .icon--measurement-own-position {
+      path, .stroke{
+        stroke: @measurementColor;
+      }
+      circle:first-child {
+        fill: @measurementColor;
+      }
+    }
     .icon--location {
       path, circle {
         stroke: @measurementColor;
@@ -101,6 +108,23 @@ button {
         fill: @measurementColor;
       }
     }
+  }
+}
+
+.toolbar__button--secondary {
+  @secondaryButtonBackgroundColor: #2c5574;
+  height: 42px;
+  width: 42px;
+
+  background: @secondaryButtonBackgroundColor;
+  &:hover {
+    background: lighten(@secondaryButtonBackgroundColor, 4);
+  }
+  &:disabled, &:disabled:hover {
+    background: @secondaryButtonBackgroundColor;
+  }
+  &.active {
+    background: lighten(@secondaryButtonBackgroundColor, 8);
   }
 }
 
@@ -139,7 +163,6 @@ button {
   left: 0;
   right: 0;
   background: @mapBackgroundColor;
-  user-select: none;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -255,9 +278,18 @@ button {
   }
 }
 
+.toolbar__button:disabled {
+  svg {
+    opacity: 0.5;
+  }
+}
+
 .toolbar__button.active {
   &.toolbar__button--geolocation-error {
     background: rgba(195, 48, 48, 0.5);
+    svg {
+      opacity: 0.5;
+    }
   }
   &.toolbar__button--geolocation-loading {
     svg {

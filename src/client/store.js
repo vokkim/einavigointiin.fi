@@ -8,7 +8,8 @@ const defaultState = {
   zoom: 10,
   follow: false,
   mapMode: MAP_MODE.NORMAL,
-  geolocationStatus: 'ok'
+  geolocationStatus: 'ok',
+  measurements: []
 }
 
 const fromLocalStorage = Store.get(LOCAL_STORAGE_KEY) || {}
@@ -37,8 +38,14 @@ export const state = Bacon.update(
   initialState,
   [filterUpdatesForKey('follow'), performStateChangeForKey('follow')],
   [filterUpdatesForKey('geolocationStatus'), performStateChangeForKey('geolocationStatus')],
-  [filterUpdatesForKey('mapMode'), performStateChangeForKey('mapMode')]
-).skipDuplicates((a, b) => JSON.stringify(a) === JSON.stringify(b))
+  [filterUpdatesForKey('mapMode'), (state, update) => {
+    return {
+      ...state,
+      mapMode: update.value,
+      measurements: update.value !== MAP_MODE.MEASURE ? [] : state.measurements}
+  }],
+  [filterUpdatesForKey('measurements'), performStateChangeForKey('measurements')]
+) //.skipDuplicates((a, b) => JSON.stringify(a) === JSON.stringify(b))
 
 
 state.onValue(data => {
@@ -49,3 +56,4 @@ state.onValue(data => {
 export const setMapMode = pushUpdateFor('mapMode')
 export const setFollow = pushUpdateFor('follow')
 export const setGeolocationStatus = pushUpdateFor('geolocationStatus')
+export const setMeasurements = pushUpdateFor('measurements')
