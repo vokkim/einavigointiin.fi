@@ -7,6 +7,7 @@ const LOCAL_STORAGE_KEY = 'einavigointiin'
 const defaultState = {
   zoom: 10,
   follow: false,
+  showHarbours: true,
   mapMode: MAP_MODE.NORMAL,
   geolocationStatus: 'ok',
   measurements: []
@@ -37,6 +38,7 @@ function pushUpdateFor(key) {
 export const state = Bacon.update(
   initialState,
   [filterUpdatesForKey('follow'), performStateChangeForKey('follow')],
+  [filterUpdatesForKey('showHarbours'), performStateChangeForKey('showHarbours')],
   [filterUpdatesForKey('geolocationStatus'), performStateChangeForKey('geolocationStatus')],
   [filterUpdatesForKey('mapMode'), (state, update) => {
     return {
@@ -49,11 +51,12 @@ export const state = Bacon.update(
 
 
 state.onValue(data => {
-  const {zoom, follow} = data
-  Store.set(LOCAL_STORAGE_KEY, {zoom, follow})
+  const {zoom, follow, showHarbours} = data
+  Store.set(LOCAL_STORAGE_KEY, {zoom, follow, showHarbours})
 })
 
 export const setMapMode = pushUpdateFor('mapMode')
 export const setFollow = pushUpdateFor('follow')
 export const setGeolocationStatus = pushUpdateFor('geolocationStatus')
 export const setMeasurements = pushUpdateFor('measurements')
+export const setShowHarbours = pushUpdateFor('showHarbours')

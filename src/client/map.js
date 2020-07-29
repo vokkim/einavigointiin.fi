@@ -35,6 +35,7 @@ export class MapWrapper extends React.Component {
     this.measureTooltipRef = React.createRef()
     this.selected = null
     this.mouseWheelZoomInteraction = null
+    this.harbourMarkerLayer = null
     this.positionAccuracyFeature = new Feature()
     this.positionFeature = new Feature()
 
@@ -89,6 +90,8 @@ export class MapWrapper extends React.Component {
     } else if (!this.props.follow && prevProps.follow) {
       this.cancelFollow()
     }
+
+    this.harbourMarkerLayer.setVisible(this.props.showHarbours)
   }
 
   render() {
@@ -171,7 +174,8 @@ export class MapWrapper extends React.Component {
       console.log(`Unknown map event type ${type}`)
     })
 
-    placeOfficialHarbourMarkers(this.map)
+    this.harbourMarkerLayer = createHarbourMarkerLayer(this.props.showHarbours)
+    this.map.addLayer(this.harbourMarkerLayer)
 
     this.tooltipOverlay = new Overlay({
       element: this.tooltipRef.current,
@@ -395,7 +399,7 @@ function getChartOptions({zoom}) {
   return {center: fromLonLat([22.96, 59.82]), zoom}
 }
 
-function placeOfficialHarbourMarkers(olMap) {
+function createHarbourMarkerLayer(showHarbours) {
   const markers = window.HARBOUR_DATA.map(harbour => {
     const harbourIcon = getIconForHarbour(harbour)
 
@@ -415,15 +419,14 @@ function placeOfficialHarbourMarkers(olMap) {
     return marker
   })
 
-  const layer = new VectorLayer({
+  return new VectorLayer({
     source: new VectorSource({
       features: markers
     }),
     minZoom: 9,
+    visible: showHarbours,
     zIndex: 1000,
   })
-
-  olMap.addLayer(layer)
 }
 
 function formatLength(line) {

@@ -19,6 +19,7 @@ button {
 
 
 @backgroundColor: #f9efca;
+@toolbarIconColor: #D8D8D8;
 @mapBackgroundColor: #fefefe;
 @primaryTextColor: #000000;
 @fadedTextColor: #888888;
@@ -79,6 +80,17 @@ button {
   }
   &:disabled:hover {
     background: @topbarBackgroundColor;
+  }
+
+  .icon--harbour {
+    height: 32px;
+    width: 32px;
+    circle {
+      stroke: @toolbarIconColor;
+    }
+    path, polygon {
+      fill: @toolbarIconColor;
+    }
   }
 
   &.active {

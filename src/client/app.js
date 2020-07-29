@@ -2,9 +2,9 @@ import React from 'react'
 import {render} from 'react-dom'
 import {Bus} from 'baconjs'
 import {MapWrapper} from './map'
-import {state, setMapMode, setFollow, setMeasurements} from './store'
+import {state, setMapMode, setFollow, setMeasurements, setShowHarbours} from './store'
 import Search from './search'
-import {MeasurementIcon, LocationIcon, TrashIcon} from './icons'
+import {MeasurementIcon, LocationIcon, TrashIcon, HarbourIcon} from './icons'
 import {MAP_MODE} from './enums'
 
 const mapEventBus = new Bus()
@@ -51,6 +51,12 @@ class App extends React.Component {
         </div>
         <div className="toolbar">
           <ToolbarButton
+            active={this.state.follow}
+            className={`toolbar__button--geolocation-${this.state.geolocationStatus}`}
+            onClick={() => setFollow(!this.state.follow)}>
+            <LocationIcon />
+          </ToolbarButton>
+          <ToolbarButton
             active={measurementMode}
             onClick={this.toggleMeasurementMode.bind(this)}
             secondaryButtons={[
@@ -65,14 +71,10 @@ class App extends React.Component {
             <MeasurementIcon />
           </ToolbarButton>
 
-
           <ToolbarButton
-            active={this.state.follow}
-            className={`toolbar__button--geolocation-${this.state.geolocationStatus}`}
-            onClick={() => {
-              setFollow(!this.state.follow)}
-            }>
-            <LocationIcon />
+            active={this.state.showHarbours}
+            onClick={() => setShowHarbours(!this.state.showHarbours)}>
+            <HarbourIcon />
           </ToolbarButton>
         </div>
         <MapWrapper {...this.state} events={mapEventBus}/>
