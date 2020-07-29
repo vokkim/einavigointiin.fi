@@ -21,6 +21,7 @@ api.get('/satellite/:z/:x/:y.jpg', (req, res) => {
   const {z, x, y} = req.params
   const url = `http://karttamoottori.maanmittauslaitos.fi/maasto/wmts/1.0.0/ortokuva/default/ETRS-TM35FIN/${z}/${y}/${x}.jpg`
   const fwdRequest = request({url, headers: {'Referer': ''}}).on('error', () => {})
+  res.header('Cache-Control', 'public, max-age=1209600, s-maxage=2764800')
   req.pipe(fwdRequest).pipe(res)
 })
 
@@ -37,7 +38,7 @@ api.get('/:z/:x/:y', (req, res) => {
       console.error(`Error fetching tile ${z}/${x}/${y}:`, err)
       res.sendStatus(500)
     } else {
-      headers['Cache-Control'] = 'public, max-age=38880000' // 450 days
+      headers['Cache-Control'] = 'public, max-age=1209600, s-maxage=2764800'
       res.writeHead(200, headers)
       res.end(tile)
     }
