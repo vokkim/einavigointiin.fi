@@ -13,9 +13,9 @@ export class LighthouseIcon extends React.Component {
           <g transform="translate(1.000000, 0.769471)" stroke="#000000">
             <g transform="translate(0.000000, 9.230529)">
               <g transform="translate(0.111973, 0.545976)">
-                <path d="M0.282079422,1.5 L6,1.5" id="Line-8" strokeLinecap="square"></path>
-                <path d="M9.5,1.5 L14.6771421,1.5" id="Line-8" strokeLinecap="square"></path>
-                <circle id="Oval" cx="7.5" cy="1.5" r="1.5"></circle>
+                <path d="M0.282079422,1.5 L6,1.5" strokeLinecap="square"></path>
+                <path d="M9.5,1.5 L14.6771421,1.5" strokeLinecap="square"></path>
+                <circle cx="7.5" cy="1.5" r="1.5"></circle>
               </g>
             </g>
             <polyline points="3.25301299 11.2305285 4.42177594 0 10.7371999 0 12.2005443 11.2305285"></polyline>
@@ -77,21 +77,21 @@ export class MeasurementIcon extends React.Component {
           <g>
             <path d="M4,0 L43,0 C45.209139,-4.05812251e-16 47,1.790861 47,4 L47,11 L0,11 L0,4 C-2.705415e-16,1.790861 1.790861,4.05812251e-16 4,0 Z" fill="#D8D8D8"></path>
             <g transform="translate(2.000000, 5.000000)" stroke="#252525" strokeLinecap="square">
-              <path d="M36.5,6 L36.5,0.5" id="Line"></path>
-              <path d="M42.5,6 L42.5,0.5" id="Line"></path>
-              <path d="M39.5,6 L39.5,2.5" id="Line"></path>
-              <path d="M0.5,6 L0.5,0.5" id="Line"></path>
-              <path d="M6.5,6 L6.5,0.5" id="Line"></path>
-              <path d="M3.5,6 L3.5,2.5" id="Line"></path>
-              <path d="M9.5,6 L9.5,2.5" id="Line"></path>
-              <path d="M12.5,6 L12.5,0.5" id="Line"></path>
-              <path d="M18.5,6 L18.5,0.5" id="Line"></path>
-              <path d="M15.5,6 L15.5,2.5" id="Line"></path>
-              <path d="M21.5,6 L21.5,2.5" id="Line"></path>
-              <path d="M24.5,6 L24.5,0.5" id="Line"></path>
-              <path d="M30.5,6 L30.5,0.5" id="Line"></path>
-              <path d="M27.5,6 L27.5,2.5" id="Line"></path>
-              <path d="M33.5,6 L33.5,2.5" id="Line"></path>
+              <path d="M36.5,6 L36.5,0.5"></path>
+              <path d="M42.5,6 L42.5,0.5"></path>
+              <path d="M39.5,6 L39.5,2.5"></path>
+              <path d="M0.5,6 L0.5,0.5"></path>
+              <path d="M6.5,6 L6.5,0.5"></path>
+              <path d="M3.5,6 L3.5,2.5"></path>
+              <path d="M9.5,6 L9.5,2.5"></path>
+              <path d="M12.5,6 L12.5,0.5"></path>
+              <path d="M18.5,6 L18.5,0.5"></path>
+              <path d="M15.5,6 L15.5,2.5"></path>
+              <path d="M21.5,6 L21.5,2.5"></path>
+              <path d="M24.5,6 L24.5,0.5"></path>
+              <path d="M30.5,6 L30.5,0.5"></path>
+              <path d="M27.5,6 L27.5,2.5"></path>
+              <path d="M33.5,6 L33.5,2.5"></path>
             </g>
             <polyline stroke="#D8D8D8" strokeWidth="2" strokeLinecap="square" points="2.5 19.5 21.8333811 16.052969 25.8007643 22.6379185 44.5 19.5"></polyline>
             <circle fill="#D8D8D8" cx="2.5" cy="19.5" r="2.5"></circle>
