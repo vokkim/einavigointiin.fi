@@ -5,6 +5,7 @@ import {MAP_MODE} from './enums'
 const LOCAL_STORAGE_KEY = 'einavigointiin'
 
 const defaultState = {
+  menuOpen: false,
   zoom: 10,
   follow: false,
   showHarbours: true,
@@ -37,6 +38,7 @@ function pushUpdateFor(key) {
 
 export const state = Bacon.update(
   initialState,
+  [filterUpdatesForKey('menuOpen'), performStateChangeForKey('menuOpen')],
   [filterUpdatesForKey('follow'), performStateChangeForKey('follow')],
   [filterUpdatesForKey('showHarbours'), performStateChangeForKey('showHarbours')],
   [filterUpdatesForKey('geolocationStatus'), performStateChangeForKey('geolocationStatus')],
@@ -55,6 +57,7 @@ state.onValue(data => {
   Store.set(LOCAL_STORAGE_KEY, {zoom, follow, showHarbours})
 })
 
+export const setMenuOpen = pushUpdateFor('menuOpen')
 export const setMapMode = pushUpdateFor('mapMode')
 export const setFollow = pushUpdateFor('follow')
 export const setGeolocationStatus = pushUpdateFor('geolocationStatus')

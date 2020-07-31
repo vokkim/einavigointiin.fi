@@ -169,3 +169,89 @@ export class TrashIcon extends React.Component {
     )
   }
 }
+
+export class VisibleIcon extends React.Component {
+  shouldComponentUpdate() {
+    return false
+  }
+  render() {
+    return (
+      <svg className="icon icon--visible" width="22px" height="14px" viewBox="0 0 22 14">
+        <g stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
+          <g fill="#D8D8D8">
+            <path d="M-7.47901741e-13,6.97100074 C3.65696038,2.32366691 7.31354329,5.20472554e-13 10.9697487,6.11954931e-13 C14.6259542,6.03073147e-13 18.3027046,2.33333333 22,7 C18.1908275,11.6666667 14.514077,14 10.9697487,14 C7.42542042,14 3.76883751,11.6570002 -7.47901741e-13,6.97100074 Z M11.0229044,11.9691958 C13.7215216,11.9691958 15.9091831,9.77003496 15.9091831,7.05723263 C15.9091831,4.3444303 13.7215216,2.14526949 11.0229044,2.14526949 C8.32428722,2.14526949 6.13662573,4.3444303 6.13662573,7.05723263 C6.13662573,9.77003496 8.32428722,11.9691958 11.0229044,11.9691958 Z"></path>
+            <circle cx="11" cy="7" r="3"></circle>
+          </g>
+        </g>
+      </svg>
+    )
+  }
+}
+
+export class HiddenIcon extends React.Component {
+  shouldComponentUpdate() {
+    return false
+  }
+  render() {
+    return (
+      <svg className="icon icon--hidden" width="22px" height="14px" viewBox="0 0 22 14">
+        <g stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
+          <g fill="#D8D8D8">
+            <path d="M-7.47901741e-13,6.97100074 C3.65696038,2.32366691 7.31354329,5.20472554e-13 10.9697487,6.11954931e-13 C14.6259542,6.03073147e-13 18.3027046,2.33333333 22,7 C18.1908275,11.6666667 14.514077,14 10.9697487,14 C7.42542042,14 3.76883751,11.6570002 -7.47901741e-13,6.97100074 Z M11.0229044,11.9691958 C13.7215216,11.9691958 15.9091831,9.77003496 15.9091831,7.05723263 C15.9091831,4.3444303 13.7215216,2.14526949 11.0229044,2.14526949 C8.32428722,2.14526949 6.13662573,4.3444303 6.13662573,7.05723263 C6.13662573,9.77003496 8.32428722,11.9691958 11.0229044,11.9691958 Z"></path>
+            <circle cx="11" cy="7" r="3"></circle>
+            <path d="M1.5,14 L22,0" stroke="#BEBEBE" strokeWidth="2" strokeLinecap="round"></path>
+          </g>
+        </g>
+      </svg>
+    )
+  }
+}
+
+export class ShareIcon extends React.Component {
+  shouldComponentUpdate() {
+    return false
+  }
+  render() {
+    return (
+      <svg className="icon icon--share" width="13px" height="17px" viewBox="0 0 13 17">
+        <g stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
+          <g>
+            <circle fill="#D8D8D8" cx="10.5" cy="2.5" r="2.5"></circle>
+            <circle fill="#D8D8D8" cx="2.5" cy="8.5" r="2.5"></circle>
+            <circle fill="#D8D8D8" cx="10.5" cy="14.5" r="2.5"></circle>
+            <polyline stroke="#D8D8D8" strokeWidth="2" points="10.5 2.5 2.5 8.5 10.5 14.6206897"></polyline>
+          </g>
+        </g>
+      </svg>
+    )
+  }
+}
+
+export class EditIcon extends React.Component {
+  shouldComponentUpdate() {
+    return false
+  }
+  render() {
+    return (
+      <svg className="icon icon--edit" width="17px" height="20px" viewBox="0 0 17 20" >
+        <g stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
+          <g fill="#D8D8D8">
+            <rect x="0" y="17.2413793" width="17" height="2.75862069"></rect>
+            <path d="M11.9708094,0.968386617 L14.5502537,0.944109479 C14.9368359,0.940471055 15.2531722,1.25090833 15.2568107,1.63749053 C15.256852,1.64188529 15.256852,1.64628035 15.2568106,1.65067511 L15.2429892,3.11726373 C15.2393944,3.49870713 14.9310517,3.80704604 14.5496082,3.8106361 L11.9701639,3.83491324 C11.5835817,3.83855166 11.2672454,3.52811439 11.263607,3.14153219 C11.2635656,3.13713743 11.2635657,3.13274237 11.2636071,3.12834761 L11.2774285,1.66175899 C11.2810232,1.28031559 11.589366,0.971976675 11.9708094,0.968386617 Z" transform="translate(13.260209, 2.389511) rotate(43.000000) translate(-13.260209, -2.389511) "></path>
+            <path d="M1.8395507,7.30858112 L13.3877306,7.41741319 C13.769174,7.42100798 14.0775129,7.72935072 14.0811029,8.11079416 L14.1053801,10.6902384 C14.1090185,11.0768206 13.7985812,11.393157 13.411999,11.3967954 C13.4076042,11.3968368 13.4032092,11.3968367 13.3988144,11.3967953 L1.88018192,11.2882417 C1.74244982,11.2869437 1.60816151,11.2450409 1.49413245,11.1677804 L-0.49202194,9.82205888 C-0.812075138,9.60520642 -0.895735867,9.16995839 -0.678883409,8.84990519 C-0.625433659,8.77101855 -0.556440475,8.70387525 -0.476130622,8.65258874 L1.45619928,7.41858747 C1.57061277,7.3455221 1.7038033,7.30730181 1.8395507,7.30858112 Z" transform="translate(6.652983, 9.352688) rotate(-47.000000) translate(-6.652983, -9.352688) "></path>
+          </g>
+        </g>
+      </svg>
+    )
+  }
+}
+
+export function MenuIcon(props) {
+  return (
+    <div className={`icon icon--menu ${props.open ? 'open' : ''}`}>
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  )
+}

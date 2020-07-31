@@ -7,7 +7,7 @@ button {
   cursor: pointer;
 }
 
-@tabletMaxWidth: 1025;
+@tabletMaxWidth: 999;
 @mobileMaxWidth: 550;
 @tabletMinWidth: (@mobileMaxWidth + 1);
 @desktopMinWidth: (@tabletMaxWidth + 1);
@@ -36,6 +36,8 @@ button {
 body {
   background: @backgroundColor;
   font-family: 'OpenSans';
+  width: 100%;
+  overflow-x: hidden;
   @media @desktop {
     font-size: 17px;
   }
@@ -54,12 +56,38 @@ button {
   }
 }
 
+.smokescreen {
+  content: '';
+  display: block;
+  position: absolute;
+  background: rgba(0, 0, 0, 0.3);
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 11;
+}
+.app.has-smokescreen {
+  #map, .topbar {
+    filter: blur(1px);
+  }
+}
+
 @toolbarBorderRadius: 3px;
+@toolbarBackground: #2f2f2f;
 .toolbar {
   position: absolute;
   left: 0;
-  z-index: 1111;
-  top: @topBarHeight + 150px;
+  right: 0;
+  background: @toolbarBackground;
+  z-index: 11;
+  display: flex;
+  top: @topBarHeight;
+
+  @media @desktop {
+    position: unset;
+    top: 0;
+  }
 }
 
 .toolbar__buttonwrapper {
@@ -146,8 +174,10 @@ button {
   top: 0;
   right: 0;
   left: 0;
+  z-index: 11;
   height: @topBarHeight;
   background: @topbarBackgroundColor;
+  align-items: center;
 }
 
 #search {
@@ -216,8 +246,10 @@ button {
     padding: 5px 15px;
   }
   .search__menu {
+    position: absolute;
     margin-top: 0px;
     border-radius: 0px;
+    z-index: 1111;
   }
   .search__option {
     cursor: pointer;
@@ -306,6 +338,148 @@ button {
   &.toolbar__button--geolocation-loading {
     svg {
       opacity: 0.5;
+    }
+  }
+}
+
+
+@menuWidth: 350px;
+.menu {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 111;
+  width: @menuWidth;
+  background: @toolbarBackground;
+  padding: (@topBarHeight + 20px) 20px 20px 20px;
+  right: -@menuWidth;
+  transition: right 300ms;
+
+  &.open {
+    right: 0;
+  }
+}
+.menu__layer {
+  display: flex;
+  align-items: center;
+  margin: 10px 0;
+
+  &.visible {
+    .menu__layer--button-visiblity {
+      opacity: 1;
+    }
+  }
+  .menu__layer--button-action, .menu__layer--button-visiblity {
+    background: transparent;
+    cursor: pointer;
+    display: block;
+    transition: background 150ms;
+    &:hover {
+      background: lighten(@toolbarBackground, 4);
+    }
+  }
+  .menu__layer--button-action {
+    margin-right: 2px;
+    width: 37px;
+    height: 37px;
+    padding: 5px;
+  }
+  .menu__layer--button-visiblity {
+    margin-right: 10px;
+    width: 37px;
+    height: 37px;
+    padding: 5px;
+    opacity: 0.6;
+    display: flex;
+    align-items: center;
+  }
+  > svg {
+    margin: 0 5px;
+  }
+  .menu__layer--label {
+    flex: 1 1 auto;
+    margin: 0 5px;
+    color: @toolbarIconColor;
+    font-size: 16px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    cursor: default;
+    white-space: nowrap;
+  }
+  .icon--harbour {
+    height: 32px;
+    width: 32px;
+    circle {
+      stroke: @toolbarIconColor;
+    }
+    path, polygon {
+      fill: @toolbarIconColor;
+    }
+  }
+}
+.topbar__spacer {
+  flex: 1 1 auto;
+}
+.menu__toggle {
+  position: absolute;
+  padding: 4px;
+  top: 4px;
+  right: 5px;
+  z-index: 1111;
+}
+@menuIconColor: @toolbarIconColor;
+.icon--menu {
+  width: 33px;
+  height: 33px;
+  position: relative;
+  transform: rotate(0deg);
+  transition: .5s ease-in-out;
+  cursor: pointer;
+
+  span {
+    display: block;
+    position: absolute;
+    height: 3px;
+    width: 100%;
+    background: @menuIconColor;
+    border-radius: 3px;
+    opacity: 1;
+    left: 0;
+    transform: rotate(0deg);
+    transition: .25s ease-in-out;
+
+    &:nth-child(1) {
+      top: 5px;
+      transform-origin: left center;
+    }
+
+    &:nth-child(2) {
+      top: 15px;
+      transform-origin: left center;
+    }
+
+    &:nth-child(3) {
+      top: 25px;
+      transform-origin: left center;
+    }
+  }
+
+  &.open span {
+    &:nth-child(1) {
+      transform: rotate(45deg);
+      top: 3px;
+      left: 0px;
+    }
+
+    &:nth-child(2) {
+      width: 0%;
+      opacity: 0;
+    }
+
+    &:nth-child(3) {
+      transform: rotate(-45deg);
+      top: 26px;
+      left: 0px;
     }
   }
 }
