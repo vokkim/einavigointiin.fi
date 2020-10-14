@@ -8,7 +8,7 @@ button {
 }
 
 @tabletMaxWidth: 999;
-@mobileMaxWidth: 550;
+@mobileMaxWidth: 600;
 @tabletMinWidth: (@mobileMaxWidth + 1);
 @desktopMinWidth: (@tabletMaxWidth + 1);
 @mobile: ~"(max-width: @{mobileMaxWidth}px)";
@@ -84,9 +84,9 @@ button {
   display: flex;
   top: @topBarHeight;
 
-  @media @desktop {
+  @media @tablet-and-desktop {
     position: unset;
-    top: 0;
+    flex: 1 1 auto;
   }
 }
 
@@ -182,9 +182,21 @@ button {
 
 #search {
   padding: 5px;
-  max-width: 400px;
+  @media @desktop {
+    width: 600px;
+    max-width: 600px;
+  }
+
+  @media @tablet {
+    width: 400px;
+  }
+
+  @media @mobile {
+    max-width: 580px;
+  }
+
   margin: 0 10px;
-  flex: 1 0 auto;
+  flex: 1 1 auto;
 }
 
 .map-wrapper {

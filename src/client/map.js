@@ -171,6 +171,12 @@ export class MapWrapper extends React.Component {
         this.pinMarker.setGeometry(new Point(coordinates))
         return
       }
+      if (type === 'zoomIn') {
+        this.map.getView().setZoom(Math.min(this.map.getView().getZoom() + 1, MAX_ZOOM))
+      }
+      if (type === 'zoomOut') {
+        this.map.getView().setZoom(Math.max(this.map.getView().getZoom() - 1, MIN_ZOOM))
+      }
       console.log(`Unknown map event type ${type}`)
     })
 

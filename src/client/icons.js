@@ -255,3 +255,40 @@ export function MenuIcon(props) {
     </div>
   )
 }
+
+
+export class PlusIcon extends React.Component {
+  shouldComponentUpdate() {
+    return false
+  }
+  render() {
+    return (
+      <svg width="28px" height="28px" viewBox="0 0 28 28">
+        <g stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
+          <g transform="translate(0.000000, -0.500000)" fill="#D8D8D8">
+            <rect x="0" y="11" width="28" height="7"></rect>
+            <rect transform="translate(14.000000, 14.500000) rotate(-270.000000) translate(-14.000000, -14.500000) " x="0" y="11" width="28" height="7"></rect>
+          </g>
+        </g>
+      </svg>
+    )
+  }
+}
+
+
+export class MinusIcon extends React.Component {
+  shouldComponentUpdate() {
+    return false
+  }
+  render() {
+    return (
+      <svg width="28px" height="28px" viewBox="0 0 28 28">
+        <g stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
+          <g transform="translate(0.000000, -0.500000)" fill="#D8D8D8">
+            <rect x="0" y="11" width="28" height="7"></rect>
+          </g>
+        </g>
+      </svg>
+    )
+  }
+}

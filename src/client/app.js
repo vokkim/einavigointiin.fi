@@ -4,13 +4,20 @@ import {Bus} from 'baconjs'
 import {MapWrapper} from './map'
 import {state, setMapMode, setFollow, setMeasurements, setShowHarbours, setMenuOpen} from './store'
 import Search from './search'
-import {MeasurementIcon, LocationIcon, TrashIcon, HarbourIcon, MenuIcon, VisibleIcon, HiddenIcon, ShareIcon, EditIcon} from './icons'
+import {MeasurementIcon, LocationIcon, TrashIcon, HarbourIcon, MenuIcon, VisibleIcon, HiddenIcon, ShareIcon, EditIcon, MinusIcon, PlusIcon} from './icons'
 import {MAP_MODE} from './enums'
 
 const mapEventBus = new Bus()
 
 function onSearchSelect(e) {
   mapEventBus.push({type: 'search', value: {latitude: e.value.latitude, longitude: e.value.longitude}})
+}
+
+function zoomIn() {
+  mapEventBus.push({type: 'zoomIn'})
+}
+function zoomOut() {
+  mapEventBus.push({type: 'zoomOut'})
 }
 
 class ToolbarButton extends React.Component {
@@ -91,8 +98,19 @@ class App extends React.Component {
               ]}>
               <MeasurementIcon />
             </ToolbarButton>
+
+            <div className="topbar__spacer"></div>
+            <ToolbarButton
+              className={'toolbar__button--zoom-in'}
+              onClick={() => zoomIn()}>
+              <PlusIcon />
+            </ToolbarButton>
+            <ToolbarButton
+              className={'toolbar__button--zoom-out'}
+              onClick={() => zoomOut()}>
+              <MinusIcon />
+            </ToolbarButton>
           </div>
-          <div className="topbar__spacer"></div>
         </div>
         {this.renderMenu()}
         <MapWrapper {...this.state} events={mapEventBus}/>
@@ -101,6 +119,7 @@ class App extends React.Component {
   }
 
   renderMenu() {
+    return true // For now.
     return (
       <div className="menu__wrapper">
         <div className="menu__toggle" onClick={() => setMenuOpen(!this.state.menuOpen)}>
