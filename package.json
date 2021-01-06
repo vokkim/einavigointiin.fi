@@ -35,7 +35,7 @@
     "uuid": "8.2.0"
   },
   "devDependencies": {
-    "axios": "0.19.2",
+    "axios": "0.21.1",
     "eslint": "7.5.0",
     "eslint-plugin-react": "7.20.4",
     "less": "3.12.2",
