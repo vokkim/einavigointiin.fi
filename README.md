@@ -24,3 +24,14 @@ With `psql -U einavigointiinfi --password einavigointiinfi`:
 
 
 ```
+
+
+## Run
+
+```
+npm run start-server
+```
+
+```
+npm run start
+```
