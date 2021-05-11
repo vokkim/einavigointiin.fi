@@ -23,7 +23,7 @@
     "baconjs": "3.0.13",
     "bluebird": "3.7.2",
     "express": "4.17.1",
-    "lodash": "4.17.19",
+    "lodash": "4.17.21",
     "ol": "6.4.0",
     "pg-promise": "10.5.8",
     "proj4": "2.6.2",
