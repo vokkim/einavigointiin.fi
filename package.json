@@ -43,7 +43,7 @@
     "mocha": "8.0.1",
     "parcel-bundler": "1.12.4",
     "request": "2.88.2",
-    "shelljs": "0.8.4",
+    "shelljs": "0.8.5",
     "which-polygon": "2.2.0"
   }
 }
