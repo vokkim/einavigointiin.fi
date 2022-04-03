@@ -20,7 +20,7 @@ new MBTiles(path.resolve(settings.chartsPath, 'merikartat.mbtiles'), (err, db) =
 api.get('/satellite/:z/:x/:y.jpg', (req, res) => {
   const {z, x, y} = req.params
   const url = `http://karttamoottori.maanmittauslaitos.fi/maasto/wmts/1.0.0/ortokuva/default/ETRS-TM35FIN/${z}/${y}/${x}.jpg`
-  const fwdRequest = request({url, headers: {'Referer': ''}}).on('error', () => {})
+  const fwdRequest = request({url, headers: {'Referer': 'https://hkp.maanmittauslaitos.fi/'}}).on('error', () => {})
   res.header('Cache-Control', 'public, max-age=1209600, s-maxage=2764800')
   req.pipe(fwdRequest).pipe(res)
 })
