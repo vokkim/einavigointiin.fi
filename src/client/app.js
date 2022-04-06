@@ -2,9 +2,9 @@ import React from 'react'
 import {render} from 'react-dom'
 import {Bus} from 'baconjs'
 import {MapWrapper} from './map'
-import {state, setMapMode, setFollow, setMeasurements, setShowHarbours, setMenuOpen} from './store'
+import {state, setMapMode, setFollow, setMeasurements, setMenuOpen} from './store'
 import Search from './search'
-import {MeasurementIcon, LocationIcon, TrashIcon, HarbourIcon, MenuIcon, VisibleIcon, HiddenIcon, ShareIcon, EditIcon, MinusIcon, PlusIcon} from './icons'
+import {MeasurementIcon, LocationIcon, TrashIcon, MinusIcon, PlusIcon} from './icons'
 import {MAP_MODE} from './enums'
 
 const mapEventBus = new Bus()
@@ -31,26 +31,6 @@ class ToolbarButton extends React.Component {
           {this.props.children}
         </button>
         {this.props.active && (this.props.secondaryButtons || [])}
-      </div>
-    )
-  }
-}
-
-class MenuLayer extends React.Component {
-  render() {
-    return (
-      <div className={`menu__layer ${this.props.visible ? 'visible' : ''} ${this.props.className || ''}`}>
-        <button
-          className={'menu__layer--button-visiblity'}
-          disabled={this.props.disabled}
-          onClick={this.props.toggleVisibility}>
-          {this.props.visible ? <VisibleIcon /> : <HiddenIcon />}
-        </button>
-        <span className="menu__layer--label">{this.props.label}</span>
-        {this.props.onEdit && <button className="menu__layer--button-action" onClick={this.props.onEdit}><EditIcon /></button>}
-        {this.props.onShare && <button className="menu__layer--button-action" onClick={this.props.onShare}><ShareIcon /></button>}
-        {this.props.onDelete && <button className="menu__layer--button-action" onClick={this.props.onDelete}><TrashIcon /></button>}
-        {this.props.extraIcon}
       </div>
     )
   }
@@ -112,30 +92,7 @@ class App extends React.Component {
             </ToolbarButton>
           </div>
         </div>
-        {this.renderMenu()}
         <MapWrapper {...this.state} events={mapEventBus}/>
-      </div>
-    )
-  }
-
-  renderMenu() {
-    return true // For now.
-    return (
-      <div className="menu__wrapper">
-        <div className="menu__toggle" onClick={() => setMenuOpen(!this.state.menuOpen)}>
-          <MenuIcon open={this.state.menuOpen}/>
-        </div>
-        <div className={`menu ${this.state.menuOpen ? 'open' : ''}`}>
-          {this.state.menuOpen && (
-            <div>
-              <MenuLayer
-                visible={this.state.showHarbours}
-                toggleVisibility={() => setShowHarbours(!this.state.showHarbours)}
-                extraIcon={<HarbourIcon />}
-                label="Viralliset satamat" />
-            </div>
-          )}
-        </div>
       </div>
     )
   }

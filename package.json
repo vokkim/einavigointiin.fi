@@ -7,15 +7,17 @@
   "scripts": {
     "start": "",
     "build": "npm run build:css && npm run build:assets && npm run build:js",
-    "build:js": "npx esbuild --loader:.js=jsx --minify --bundle --target=chrome76,firefox68,safari13 --outfile=dist/app.js src/client/app.js",
+    "build:js": "npx esbuild --loader:.js=jsx --sourcemap --bundle --target=chrome76,firefox68,safari13 --outfile=dist/app.js src/client/app.js",
+    "build:js-production": "npx esbuild --loader:.js=jsx --minify --bundle --target=chrome76,firefox68,safari13 --outfile=dist/app.js src/client/app.js",
     "build:css": "npx lessc --autoprefix='defaults' --clean-css='--s1 --advanced' assets/styles/app.less dist/styles.css",
     "build:assets": "cp -rf assets/*.svg dist/ && cp -rf assets/index.html dist/",
-    "start-server": "node src/server/server.js",
+    "db:migrate": "source .env && db-migrate up",
+    "db:reset": "source .env && db-migrate down && db-migrate up",
+    "start:server": "source .env && node src/server/server.js",
     "eslint": "npx eslint src/client/",
     "eslint-fix": "npx eslint src/client/ --fix",
     "test": "npx mocha test/*",
-    "old-build": "parcel build assets/index.html",
-    "old.start": "parcel assets/index.html"
+    "connect-db": "psql einavigointiinfi"
   },
   "repository": {
     "type": "git",
@@ -28,6 +30,8 @@
     "baconjs": "3.0.17",
     "bluebird": "3.7.2",
     "browserslist": "^4.20.2",
+    "db-migrate": "^0.11.13",
+    "db-migrate-pg": "^1.2.2",
     "express": "4.17.3",
     "lodash": "4.17.21",
     "ol": "6.14.1",
@@ -41,8 +45,8 @@
     "uuid": "8.3.2"
   },
   "devDependencies": {
-    "esbuild": "^0.14.31",
     "axios": "0.26.1",
+    "esbuild": "^0.14.31",
     "eslint": "8.12.0",
     "eslint-plugin-react": "7.29.4",
     "less": "4.1.2",

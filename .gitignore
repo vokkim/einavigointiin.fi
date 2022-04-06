@@ -5,3 +5,5 @@ npm-debug.*
 client-config.json
 charts/
 import/*.geojson
+.env
+migrations/*-fixtures.js
