@@ -27,6 +27,7 @@ app.get('/view/:key/', async (req, res) => {
   if (!view) {
     return res.sendStatus(404)
   }
+  console.log(`Fetch view '${req.params.key}'`)
   const harbours = await db.getHarbours(['official_harbour'], [view.id])
   res.set('Cache-Control', 'public, max-age=86400')
   res.send(renderIndex(harbours))
@@ -37,6 +38,7 @@ app.get('(/view/:key)?/search/:search', async (req, res) => {
   if (searchParam.length < 3) {
     return res.sendStatus(400)
   }
+  console.log(`Search: '${req.params.search}'`)
   if (req.params.key) {
     const view = await findView(req.params.key)
     if (!view) {
